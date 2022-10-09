@@ -4,7 +4,7 @@ A small library to use Urql with Qwik.
 
 - :white_check_mark: Query & mutation hooks
 - :white_check_mark: SSR state shared to the frontend client
-- :white_check_mark: Lazy loaded client (A tiny file still loads on startup)
+- :white_check_mark: Lazy loaded client
 - :white_check_mark: Auth tokens
 - :white_check_mark: Abort signals
 - :hourglass: Reactive cache / watch for changes
@@ -27,17 +27,23 @@ export const clientFactory = () => {
 };
 ```
 
-Now register the client in your root.tsx component and wrap the client in a QRL to ensure it is lazy loaded.
+Now provide the client in your root.tsx component and wrap the client in a QRL to ensure it is lazy loaded.
 
 ```TypeScript
 import { $, component$ } from '@builder.io/qwik';
-import { registerClientFactory } from 'qwik-urql';
 import { clientFactory } from './client';
 
 export default component$(() => {
-  registerClientFactory($(clientFactory));
-
-  return /** Your app */;
+  return (
+    <UrqlProvider client={$(clientFactory)}>
+      <QwikCity>
+        <head></head>
+        <body lang='en'>
+          ...
+        </body>
+      </QwikCity>
+    </UrqlProvider>
+  );
 });
 ```
 
@@ -107,32 +113,6 @@ export const clientFactory = (ssrStore: {}) => {
     exchanges: [dedupExchange, cacheExchange({}), ssr, fetchExchange],
   });
 };
-```
-
-You then need to add the `UrqlProvider` to your app so that the ssrStore can
-be injected into your client ssrExchange:
-
-```TypeScript
-import { UrqlProvider } from 'qwik-urql';
-
-export default component$(() => {
-  registerClientFactory($(clientFactory));
-
-  return (
-    <UrqlProvider>
-      <QwikCity>
-        <head>
-          <meta charSet='utf-8' />
-          <RouterHead />
-        </head>
-        <body lang='en'>
-          <RouterOutlet />
-          <ServiceWorkerRegister />
-        </body>
-      </QwikCity>
-    </UrqlProvider>
-  );
-});
 ```
 
 ## Authentication
@@ -214,9 +194,6 @@ your `root.tsx`:
 import { UrqlProvider } from 'qwik-urql';
 
 export default component$(() => {
-  // Register your client factory
-  registerClientFactory($(clientFactory));
-
   // Get access to your authentication tokens
   const session = useCookie('session');
 
@@ -225,7 +202,7 @@ export default component$(() => {
 
   return (
     // Provide them to your entire app
-    <UrqlProvider auth={authState}>
+    <UrqlProvider auth={authState} client={$(clientFactory)}>
       <QwikCity>
         <head>
           <meta charSet='utf-8' />

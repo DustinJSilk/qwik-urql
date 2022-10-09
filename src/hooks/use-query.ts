@@ -7,7 +7,11 @@ import {
 } from '@urql/core';
 import { fetchWithAbort } from '../client/fetch-with-abort';
 import { getClient } from '../client/get-client';
-import { UrqlAuthContext, UrqlCacheContext } from '../components/urql-provider';
+import {
+  UrqlAuthContext,
+  UrqlCacheContext,
+  UrqlClientContext,
+} from '../components/urql-provider';
 
 export const useQuery = <Variables extends AnyVariables, Data = any>(
   query: TypedDocumentNode<Data, Variables> & {
@@ -16,6 +20,7 @@ export const useQuery = <Variables extends AnyVariables, Data = any>(
   vars: Variables,
   context?: Partial<OperationContext>
 ) => {
+  const clientFactory = useContext(UrqlClientContext);
   const initialCacheState = useContext(UrqlCacheContext);
   const tokens = useContext(UrqlAuthContext);
 
@@ -25,7 +30,7 @@ export const useQuery = <Variables extends AnyVariables, Data = any>(
         track(vars);
       }
 
-      const client = await getClient(initialCacheState, tokens);
+      const client = await getClient(clientFactory, initialCacheState, tokens);
 
       const abortCtrl = new AbortController();
       cleanup(() => abortCtrl.abort());
