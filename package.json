@@ -51,6 +51,9 @@
     "url": "https://github.com/DustinJSilk/qwik-urql/issues"
   },
   "homepage": "https://github.com/DustinJSilk/qwik-urql#readme",
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org"
+  },
   "devDependencies": {
     "@builder.io/qwik": "0.10.0",
     "@types/eslint": "8.4.6",
