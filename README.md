@@ -331,7 +331,7 @@ return <FilmResource
 
 ## Example app
 
-**The example requires this PR for authentication to work. To check
+**The example requires [this PR](https://github.com/BuilderIO/qwik/pull/1594) for authentication to work. To test
 authentication you will need to build it yourself and update your node_modules
 until it is merged**
 
