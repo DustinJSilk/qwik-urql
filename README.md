@@ -2,11 +2,11 @@
 
 A small library to use Urql with Qwik.
 
-- :chart: Query & mutation hooks
-- :chart: SSR state shared to the frontend client
-- :chart: Lazy loaded client (A tiny file still loads on startup)
-- :chart: Auth tokens
-- :chart: Abort signals
+- :white_check_mark: Query & mutation hooks
+- :white_check_mark: SSR state shared to the frontend client
+- :white_check_mark: Lazy loaded client (A tiny file still loads on startup)
+- :white_check_mark: Auth tokens
+- :white_check_mark: Abort signals
 - :hourglass: Reactive cache / watch for changes
 - :hourglass: Optimistic response
 - :hourglass: Code generators
@@ -63,7 +63,7 @@ export const Query = gql`
 
 export default component$(() => {
   const vars = useStore({ id: '...' })
-  const query = useQuery(Query, vars);
+  const query = useQuery(Query, vars, { requestPolicy: 'network-only' });
 
   return <Resource
     value={query}
@@ -328,6 +328,23 @@ return <FilmResource
   )}
 />
 ```
+
+## Example app
+
+**The example requires this PR for authentication to work. To check
+authentication you will need to build it yourself and update your node_modules
+until it is merged**
+
+An example app is included in the repository.
+The source code is found in `src/example`
+
+Run the mock GraphQL server with
+
+`yarn api`
+
+Then run the Qwik City app with
+
+`yarn start`
 
 ## Development
 

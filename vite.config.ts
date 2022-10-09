@@ -1,5 +1,6 @@
-import { defineConfig } from 'vite';
+import { qwikCity } from '@builder.io/qwik-city/vite';
 import { qwikVite } from '@builder.io/qwik/optimizer';
+import { defineConfig } from 'vite';
 
 export default defineConfig(() => {
   return {
@@ -11,6 +12,6 @@ export default defineConfig(() => {
         fileName: (format) => `index.qwik.${format === 'es' ? 'mjs' : 'cjs'}`,
       },
     },
-    plugins: [qwikVite()],
+    plugins: [qwikCity({ routesDir: 'src/example/routes' }), qwikVite()],
   };
 });

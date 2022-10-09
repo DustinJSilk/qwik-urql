@@ -1,5 +1,10 @@
 import { useContext, useResource$ } from '@builder.io/qwik';
-import { AnyVariables, OperationResult, TypedDocumentNode } from '@urql/core';
+import {
+  AnyVariables,
+  OperationContext,
+  OperationResult,
+  TypedDocumentNode,
+} from '@urql/core';
 import { fetchWithAbort } from '../client/fetch-with-abort';
 import { getClient } from '../client/get-client';
 import { UrqlAuthContext, UrqlCacheContext } from '../components/urql-provider';
@@ -8,7 +13,8 @@ export const useQuery = <Variables extends AnyVariables, Data = any>(
   query: TypedDocumentNode<Data, Variables> & {
     kind: string;
   },
-  vars: Variables
+  vars: Variables,
+  context?: Partial<OperationContext>
 ) => {
   const initialCacheState = useContext(UrqlCacheContext);
   const tokens = useContext(UrqlAuthContext);
@@ -26,6 +32,7 @@ export const useQuery = <Variables extends AnyVariables, Data = any>(
 
       const res = await client
         .query<Data, Variables>(query, vars, {
+          ...context,
           fetch: fetchWithAbort(abortCtrl),
         })
         .toPromise();
