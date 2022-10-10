@@ -1,10 +1,11 @@
-import { useContext, useResource$ } from '@builder.io/qwik';
+import { useContext, useResource$, useStore } from '@builder.io/qwik';
 import {
   AnyVariables,
   OperationContext,
   OperationResult,
   TypedDocumentNode,
 } from '@urql/core';
+import { pipe, subscribe } from 'wonka';
 import { fetchWithAbort } from '../client/fetch-with-abort';
 import { getClient } from '../client/get-client';
 import {
@@ -14,7 +15,7 @@ import {
   UrqlSsrContext,
 } from '../components/urql-provider';
 
-export const useMutationResource = <Variables extends AnyVariables, Data = any>(
+export const useWatchQuery = <Variables extends AnyVariables, Data = any>(
   query: TypedDocumentNode<Data, Variables> & {
     kind: string;
   },
@@ -25,6 +26,10 @@ export const useMutationResource = <Variables extends AnyVariables, Data = any>(
   const ssrStore = useContext(UrqlSsrContext);
   const qwikStore = useContext(UrqlQwikContext);
   const tokens = useContext(UrqlAuthContext);
+
+  const output = useStore<OperationResult<Data, Variables>>({} as any, {
+    recursive: true,
+  });
 
   return useResource$<OperationResult<Data, Variables>>(
     async ({ track, cleanup }) => {
@@ -40,18 +45,29 @@ export const useMutationResource = <Variables extends AnyVariables, Data = any>(
       );
 
       const abortCtrl = new AbortController();
-      cleanup(() => abortCtrl.abort());
 
-      const res = await client
-        .mutation<Data, Variables>(query, vars, {
-          ...context,
-          fetch: fetchWithAbort(abortCtrl),
-        })
-        .toPromise();
+      const request = client.query<Data, Variables>(query, vars, {
+        ...context,
+        fetch: fetchWithAbort(abortCtrl),
+        store: output,
+        resume: true,
+      });
 
-      delete res.operation.context.fetch;
+      return new Promise((resolve, reject) => {
+        // A subscription keeps the query alive but the store is updated in
+        // the qwikExchange
+        const { unsubscribe } = pipe(
+          request,
+          subscribe((result) => {
+            resolve(output);
+          })
+        );
 
-      return res;
+        cleanup(() => {
+          abortCtrl.abort();
+          unsubscribe();
+        });
+      });
     }
   );
 };

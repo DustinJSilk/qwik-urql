@@ -9,8 +9,9 @@ import { fetchWithAbort } from '../client/fetch-with-abort';
 import { getClient } from '../client/get-client';
 import {
   UrqlAuthContext,
-  UrqlCacheContext,
   UrqlClientContext,
+  UrqlQwikContext,
+  UrqlSsrContext,
 } from '../components/urql-provider';
 
 export const useQuery = <Variables extends AnyVariables, Data = any>(
@@ -21,7 +22,8 @@ export const useQuery = <Variables extends AnyVariables, Data = any>(
   context?: Partial<OperationContext>
 ) => {
   const clientFactory = useContext(UrqlClientContext);
-  const initialCacheState = useContext(UrqlCacheContext);
+  const ssrStore = useContext(UrqlSsrContext);
+  const qwikStore = useContext(UrqlQwikContext);
   const tokens = useContext(UrqlAuthContext);
 
   return useResource$<OperationResult<Data, Variables>>(
@@ -30,7 +32,12 @@ export const useQuery = <Variables extends AnyVariables, Data = any>(
         track(vars);
       }
 
-      const client = await getClient(clientFactory, initialCacheState, tokens);
+      const client = await getClient(
+        clientFactory,
+        ssrStore,
+        qwikStore,
+        tokens
+      );
 
       const abortCtrl = new AbortController();
       cleanup(() => abortCtrl.abort());

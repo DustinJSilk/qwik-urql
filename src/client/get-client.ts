@@ -5,12 +5,13 @@ import { ClientFactoryStore, UrqlAuthTokens } from '../types';
 export const getClient = async (
   factory: ClientFactoryStore,
   ssrStore: {},
-  authToken?: UrqlAuthTokens
+  qwikStore: {},
+  authTokens?: UrqlAuthTokens
 ) => {
   let client: Client | undefined = undefined;
 
   if (isServer || (!isServer && !(window as any).__urqlClient)) {
-    client = await factory.factory(ssrStore, authToken);
+    client = await factory.factory({ ssrStore, authTokens, qwikStore });
 
     if (!isServer) {
       (window as any).__urqlClient = client;

@@ -8,7 +8,8 @@ import {
 } from '@builder.io/qwik';
 import { ClientFactory, ClientFactoryStore, UrqlAuthTokens } from '../types';
 
-export const UrqlCacheContext = createContext<{}>('urql-cache-ctx');
+export const UrqlSsrContext = createContext<{}>('urql-ssr-ctx');
+export const UrqlQwikContext = createContext<{}>('urql-qwik-ctx');
 export const UrqlAuthContext = createContext<UrqlAuthTokens>('urql-auth-ctx');
 export const UrqlClientContext =
   createContext<ClientFactoryStore>('urql-client-ctx');
@@ -19,12 +20,14 @@ export type UrqlProviderProps = {
 };
 
 export const UrqlProvider = component$((props: UrqlProviderProps) => {
-  const cacheStore = useStore({});
-  const factoryStore = useStore({ factory: props.client });
+  const ssrStore = useStore({});
+  const clientFactoryStore = useStore({ factory: props.client });
+  const qwikStore = useStore({});
 
-  useContextProvider(UrqlCacheContext, cacheStore);
+  useContextProvider(UrqlSsrContext, ssrStore);
+  useContextProvider(UrqlQwikContext, qwikStore);
   useContextProvider(UrqlAuthContext, props.auth ?? {});
-  useContextProvider(UrqlClientContext, factoryStore);
+  useContextProvider(UrqlClientContext, clientFactoryStore);
 
   return <Slot />;
 });

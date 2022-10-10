@@ -8,9 +8,10 @@ export type UrqlAuthTokens = { token?: string; refresh?: string };
  * can be used with the ssrExchange to resume state after SSR and an auth token
  * which can be used by the authExchange to pass a bearer token with requests
  */
-export type ClientFactory = (
-  ssrStore: {},
-  authToken?: UrqlAuthTokens
-) => Client;
+export type ClientFactory = (props: {
+  ssrStore: {};
+  authTokens?: UrqlAuthTokens;
+  qwikStore: {};
+}) => Client;
 
 export type ClientFactoryStore = { factory: QRL<ClientFactory> };

@@ -17,8 +17,9 @@ import { fetchWithAbort } from '../client/fetch-with-abort';
 import { getClient } from '../client/get-client';
 import {
   UrqlAuthContext,
-  UrqlCacheContext,
   UrqlClientContext,
+  UrqlQwikContext,
+  UrqlSsrContext,
 } from '../components/urql-provider';
 
 /**
@@ -40,7 +41,8 @@ export const useMutation = <Variables extends AnyVariables, Data = any>(
   context?: Partial<OperationContext>
 ): MutationResult<Variables, Data> => {
   const clientFactory = useContext(UrqlClientContext);
-  const initialCacheState = useContext(UrqlCacheContext);
+  const ssrStore = useContext(UrqlSsrContext);
+  const qwikStore = useContext(UrqlQwikContext);
   const tokens = useContext(UrqlAuthContext);
 
   const vars = useStore({ value: initialVars as Variables });
@@ -72,7 +74,7 @@ export const useMutation = <Variables extends AnyVariables, Data = any>(
       return;
     }
 
-    const client = await getClient(clientFactory, initialCacheState, tokens);
+    const client = await getClient(clientFactory, ssrStore, qwikStore, tokens);
 
     const abortCtrl = new AbortController();
     cleanup(() => abortCtrl.abort());
