@@ -8,8 +8,8 @@ export type QwikExchangeCache = Record<
 >;
 
 /**
- * This exchange allows us to resume query subscriptions from SSR on the
- * frontend.
+ * This exchange allows us to resume SSR query subscriptions on the client
+ * and watch the cache for updates to queries.
  *
  * @param cache this must be an empty Qwik store
  */

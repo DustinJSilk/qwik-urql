@@ -1,6 +1,7 @@
 import { component$, JSXNode, Resource } from '@builder.io/qwik';
 import { gql, OperationResult } from '@urql/core';
 import { useQuery } from '../../../../hooks/use-query';
+import { useWatchQuery } from '../../../../hooks/use-watch-query';
 
 /**
  * This entire file should be auto generated for every query.
@@ -31,6 +32,10 @@ export const useFilmQuery = (vars: FilmQueryVars) => {
   return useQuery(FilmQuery, vars);
 };
 
+export const useFilmWatchQuery = (vars: FilmQueryVars) => {
+  return useWatchQuery(FilmQuery, vars);
+};
+
 export type FilmResourceProps = {
   vars: FilmQueryVars;
   onResolved$: (
@@ -43,6 +48,20 @@ export type FilmResourceProps = {
 export const FilmResource = component$((props: FilmResourceProps) => {
   const vars = props.vars;
   const value = useFilmQuery(vars);
+
+  return (
+    <Resource
+      value={value}
+      onPending={props.onPending$}
+      onRejected={props.onRejected$}
+      onResolved={props.onResolved$}
+    />
+  );
+});
+
+export const FilmWatchResource = component$((props: FilmResourceProps) => {
+  const vars = props.vars;
+  const value = useFilmWatchQuery(vars);
 
   return (
     <Resource

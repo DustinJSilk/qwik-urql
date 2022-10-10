@@ -7,10 +7,15 @@ import {
 } from '@urql/core';
 import { authExchange } from '@urql/exchange-auth';
 import { cacheExchange } from '@urql/exchange-graphcache';
-import { UrqlAuthTokens } from '../types';
+import { qwikExchange } from '../exchanges/qwik-exchange';
+import { ClientFactory, UrqlAuthTokens } from '../types';
 import { ssrExchange } from './ssr-exchange';
 
-export const clientFactory = (ssrStore: {}, authTokens?: UrqlAuthTokens) => {
+export const clientFactory: ClientFactory = ({
+  ssrStore,
+  authTokens,
+  qwikStore,
+}) => {
   const ssr = ssrExchange({
     isClient: !isServer,
     initialState: isServer ? undefined : ssrStore,
@@ -63,6 +68,13 @@ export const clientFactory = (ssrStore: {}, authTokens?: UrqlAuthTokens) => {
 
   return createClient({
     url: 'http://localhost:3000/graphql',
-    exchanges: [dedupExchange, cacheExchange({}), ssr, auth, fetchExchange],
+    exchanges: [
+      qwikExchange(qwikStore),
+      dedupExchange,
+      cacheExchange({}),
+      ssr,
+      auth,
+      fetchExchange,
+    ],
   });
 };
