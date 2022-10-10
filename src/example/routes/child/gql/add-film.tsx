@@ -1,6 +1,6 @@
 import { component$, JSXNode, Resource } from '@builder.io/qwik';
 import { gql, OperationResult } from '@urql/core';
-import { useMutation } from '../../../../hooks/use-mutation';
+import { useMutationResource } from '../../../../hooks/use-mutation-resource';
 
 /**
  * This entire file should be auto generated for every query.
@@ -32,7 +32,7 @@ export const AddFilmMutation = gql`
 `;
 
 export const useAddFilmMutation = (vars: AddFilmMutationVars) => {
-  return useMutation(AddFilmMutation, vars);
+  return useMutationResource(AddFilmMutation, vars);
 };
 
 export type FilmResourceProps = {

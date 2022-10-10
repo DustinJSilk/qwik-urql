@@ -7,10 +7,10 @@ A small library to use Urql with Qwik.
 - :white_check_mark: Lazy loaded client
 - :white_check_mark: Auth tokens
 - :white_check_mark: Abort signals
-- :hourglass: Reactive cache / watch for changes
-- :hourglass: Optimistic response
+- :white_check_mark: Re-execute queries (see example app buttons)
+- :hourglass: Reactive cache / watch for changes [Read why this is difficult](#reactive-cache)
+- :hourglass: Optimistic response (This requires a reactive cache)
 - :hourglass: Code generators
-- :hourglass: Re-execute queries
 
 ## Setup
 
@@ -50,7 +50,7 @@ export default component$(() => {
 ## Queries
 
 First compile the GQL and then call `useQuery`. The result is a Qwik
-ResourceResource which can be used with the `<Resource />` component.
+ResourceReturn which can be used with the `<Resource />` component.
 
 ```TypeScript
 import { component$, JSXNode, Resource } from '@builder.io/qwik';
@@ -82,7 +82,36 @@ export default component$(() => {
 
 ## Mutations
 
-Mutations work the exact same as queries but use the `useMutation` hook.
+There are 2 hooks for running a mutation.
+
+- The `useMutationResource` works the exact same as `useQuery`. It will trigger
+  as soon as the component loads. You can then re-trigger it by changing the
+  input store.
+- The `useMutation` returns a store that includes the `data`, `errors`,
+  `loading` state, and a method to execute the mutation `mutate$`. This allows
+  you to delay the execution of the request until a user interaction happens.
+
+```TypeScript
+export const Mutation = gql`
+  mutation UpdateItem($id: String!, $title: String!) {
+    item(id: $id, title: $title) {
+      id
+      title
+    }
+  }
+`;
+
+export default component$(() => {
+  // You can pass in variables during initialisation or execution
+  const initialVars = useStore({ id: '...' })
+  const { data, errors, loading, mutate$ } = useMutation(Mutation, initialVars);
+
+  return <>
+    { loading ? 'loading' : 'done' }
+    <button onClick$={() => mutate$({ title: '...' })}>Mutate</button>
+  </>
+})
+```
 
 ## SSR
 
@@ -322,6 +351,24 @@ Run the mock GraphQL server with
 Then run the Qwik City app with
 
 `yarn start`
+
+## Reactive cache
+
+Updating the UI when the GQL cache updates is not currently possible. This
+is because of how the cache works
+
+- Urql's cache has been optimised for speed which means the data structure can't
+  easily be serialized into a store so we can't simply update the cache to use a
+  Qwik store.
+- Listening for changes to the cache and placing the changes into a Qwik store
+  requires a Urql (wonka) subscription which needs to be initiated by some
+  JavaScript. Because Qwik performs SSR, subscriptions are initiated on the
+  server but then can't resume on the client without some JavaScript loading
+  which goes against Qwiks best practices.
+
+To make this work we need to use Qwik stores to avoid loading JavaScript which
+sits between the cache and the client. This may be difficult if Qwik stores
+can only be created inside components$.
 
 ## Development
 

@@ -7,6 +7,7 @@ import {
 import { DocumentHead, Link } from '@builder.io/qwik-city';
 import { AddFilmResource } from './gql/add-film';
 import { FilmResource } from './gql/film';
+import { useUpdateFilmMutation } from './gql/update-film';
 
 export default component$(() => {
   useStylesScoped$(`
@@ -26,7 +27,10 @@ export default component$(() => {
 
   const storeA = useStore({ id: '0' });
   const storeB = useStore({ input: { title: 'Newly added' } });
+  const storeC = useStore({ input: { id: '0', title: 'Updated title' } });
   const titleRef = useRef();
+
+  const { mutate$, loading } = useUpdateFilmMutation();
 
   return (
     <>
@@ -57,7 +61,9 @@ export default component$(() => {
         </li>
 
         <li>
-          <h3>Mutation</h3>
+          <h3>Instant mutation</h3>
+          This uses a resource and executes immediately. There is also a button
+          to trigger more mutations. <br />
           Add film title to show ID:
           <input type='text' value={storeB.input.title} ref={titleRef} />
           <button
@@ -78,6 +84,29 @@ export default component$(() => {
               <>{res.data ? res.data.addFilm.id : 'Failed'}</>
             )}
           />
+        </li>
+
+        <li>
+          <h3>Execute mutation</h3>
+          Update film 0's title (Subscribing to changes isnt possible yet, you
+          need to refresh):
+          <input
+            type='text'
+            value={storeC.input.title}
+            onKeyUp$={(ev) =>
+              (storeC.input.title = (ev.target as HTMLInputElement).value)
+            }
+          />
+          <button
+            onClick$={async () => {
+              await mutate$(storeC);
+            }}
+          >
+            Update
+          </button>
+          <br />
+          Loading: {loading.value ? 'true' : 'false'}
+          <br />
         </li>
       </ul>
     </>

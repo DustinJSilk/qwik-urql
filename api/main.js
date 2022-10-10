@@ -19,12 +19,18 @@ var schema = buildSchema(`
     title: String!
   }
 
+  input UpdateFilmInput {
+    id: String!
+    title: String!
+  }
+
   type Query {
     film(id: String!): Film
   }
 
   type Mutation {
     addFilm(input: AddFilmInput!): Film!
+    updateFilm(input: UpdateFilmInput!): Film!
   }
 `);
 
@@ -40,6 +46,11 @@ var root = {
     const { title } = input;
     const id = data.length;
     data.push(title);
+    return { title, id };
+  },
+  updateFilm: async ({ input }) => {
+    const { title, id } = input;
+    data[id] = title;
     return { title, id };
   },
 };

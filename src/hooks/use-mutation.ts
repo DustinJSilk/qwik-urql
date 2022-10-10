@@ -1,8 +1,16 @@
-import { useContext, useResource$ } from '@builder.io/qwik';
+import {
+  $,
+  QRL,
+  Signal,
+  useContext,
+  useSignal,
+  useStore,
+  useWatch$,
+} from '@builder.io/qwik';
 import {
   AnyVariables,
+  CombinedError,
   OperationContext,
-  OperationResult,
   TypedDocumentNode,
 } from '@urql/core';
 import { fetchWithAbort } from '../client/fetch-with-abort';
@@ -13,38 +21,73 @@ import {
   UrqlClientContext,
 } from '../components/urql-provider';
 
+/**
+ * The mutate function needs to be a QRL
+ * We're trying to make it callable without a resource
+ */
+export type MutationResult<Variables extends AnyVariables, Data = any> = {
+  loading: Signal<boolean>;
+  data?: Data;
+  error?: CombinedError;
+  mutate$: QRL<(vars: Variables) => void>;
+};
+
 export const useMutation = <Variables extends AnyVariables, Data = any>(
   query: TypedDocumentNode<Data, Variables> & {
     kind: string;
   },
-  vars: Variables,
+  initialVars?: Partial<Variables>,
   context?: Partial<OperationContext>
-) => {
+): MutationResult<Variables, Data> => {
   const clientFactory = useContext(UrqlClientContext);
   const initialCacheState = useContext(UrqlCacheContext);
   const tokens = useContext(UrqlAuthContext);
 
-  return useResource$<OperationResult<Data, Variables>>(
-    async ({ track, cleanup }) => {
-      if (vars) {
-        track(vars);
-      }
+  const vars = useStore({ value: initialVars as Variables });
+  const trigger = useStore({ i: 0 });
+  const loadingSignal = useSignal(false);
 
-      const client = await getClient(clientFactory, initialCacheState, tokens);
+  const results = useStore<MutationResult<Variables, Data>>({
+    loading: loadingSignal,
+    data: undefined,
+    error: undefined,
+    mutate$: $((input: Variables) => {
+      vars.value = {
+        ...vars.value,
+        ...input,
+      };
 
-      const abortCtrl = new AbortController();
-      cleanup(() => abortCtrl.abort());
+      loadingSignal.value = true;
 
-      const res = await client
-        .mutation<Data, Variables>(query, vars, {
-          ...context,
-          fetch: fetchWithAbort(abortCtrl),
-        })
-        .toPromise();
+      trigger.i++;
+    }),
+  });
 
-      delete res.operation.context.fetch;
-
-      return res;
+  useWatch$(async ({ track, cleanup }) => {
+    if (vars) {
+      track(vars);
     }
-  );
+
+    if (trigger.i === 0) {
+      return;
+    }
+
+    const client = await getClient(clientFactory, initialCacheState, tokens);
+
+    const abortCtrl = new AbortController();
+    cleanup(() => abortCtrl.abort());
+
+    const res = await client
+      .mutation<Data, Variables>(query, vars.value, {
+        ...context,
+        fetch: fetchWithAbort(abortCtrl),
+      })
+      .toPromise();
+
+    loadingSignal.value = false;
+    results.data = res.data;
+    results.error = res.error;
+  });
+
+  return results;
 };
