@@ -32,10 +32,7 @@ export const useWatchQuery = <Variables extends AnyVariables, Data = any>(
   const qwikStore = useContext(UrqlQwikContext);
   const tokens = useContext(UrqlAuthContext);
 
-  const output = useStore<OperationResult<Data, Variables>>({} as any, {
-    recursive: true,
-    reactive: true,
-  });
+  const output = useStore<OperationResult<Data, Variables>>({} as any);
 
   const trigger = useSignal(0);
 
