@@ -19,7 +19,6 @@ import {
   UrqlAuthContext,
   UrqlClientContext,
   UrqlQwikContext,
-  UrqlSsrContext,
 } from '../components/urql-provider';
 
 /**
@@ -41,7 +40,6 @@ export const useMutation = <Variables extends AnyVariables, Data = any>(
   context?: Partial<OperationContext>
 ): MutationResult<Variables, Data> => {
   const clientFactory = useContext(UrqlClientContext);
-  const ssrStore = useContext(UrqlSsrContext);
   const qwikStore = useContext(UrqlQwikContext);
   const tokens = useContext(UrqlAuthContext);
 
@@ -74,7 +72,7 @@ export const useMutation = <Variables extends AnyVariables, Data = any>(
       return;
     }
 
-    const client = await getClient(clientFactory, ssrStore, qwikStore, tokens);
+    const client = await getClient(clientFactory, qwikStore, tokens);
 
     const abortCtrl = new AbortController();
     cleanup(() => abortCtrl.abort());

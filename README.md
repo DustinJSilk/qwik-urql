@@ -118,7 +118,7 @@ export default component$(() => {
 ## SSR
 
 Qwik doesn't hydrate on the client after SSR. This means we don't need to
-support the SSR exchange, it works without it.
+support the SSR exchange, everything works without it.
 
 ## Reactive cache
 
@@ -158,13 +158,7 @@ factory now accepts an authTokens parameter which can be used when making your
 requests.
 
 ```TypeScript
-export const clientFactory = (ssrStore: {}, authTokens?: UrqlAuthTokens) => {
-  const ssr = ssrExchange({
-    isClient: !isServer,
-    initialState: isServer ? undefined : ssrStore,
-    store: ssrStore,
-  });
-
+export const clientFactory: ClientFactory = ({ authTokens }) => {
   const auth = authExchange<UrqlAuthTokens>({
     getAuth: async ({ authState }) => {
       if (!authState) {
@@ -211,7 +205,7 @@ export const clientFactory = (ssrStore: {}, authTokens?: UrqlAuthTokens) => {
 
   return createClient({
     url: 'http://localhost:3000/graphql',
-    exchanges: [dedupExchange, cacheExchange({}), ssr, auth, fetchExchange],
+    exchanges: [dedupExchange, cacheExchange({}), auth, fetchExchange],
   });
 };
 ```
