@@ -1,4 +1,3 @@
-import { isServer } from '@builder.io/qwik/build';
 import {
   createClient,
   dedupExchange,
@@ -7,21 +6,10 @@ import {
 } from '@urql/core';
 import { authExchange } from '@urql/exchange-auth';
 import { cacheExchange } from '@urql/exchange-graphcache';
-import { qwikExchange } from '../exchanges/qwik-exchange';
+import { qwikExchange } from '../exchange/qwik-exchange';
 import { ClientFactory, UrqlAuthTokens } from '../types';
-import { ssrExchange } from './ssr-exchange';
 
-export const clientFactory: ClientFactory = ({
-  ssrStore,
-  authTokens,
-  qwikStore,
-}) => {
-  const ssr = ssrExchange({
-    isClient: !isServer,
-    initialState: isServer ? undefined : ssrStore,
-    store: ssrStore,
-  });
-
+export const clientFactory: ClientFactory = ({ authTokens, qwikStore }) => {
   const auth = authExchange<UrqlAuthTokens>({
     getAuth: async ({ authState }) => {
       if (!authState) {
@@ -72,7 +60,6 @@ export const clientFactory: ClientFactory = ({
       qwikExchange(qwikStore),
       dedupExchange,
       cacheExchange({}),
-      ssr,
       auth,
       fetchExchange,
     ],

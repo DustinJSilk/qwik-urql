@@ -1,11 +1,16 @@
-import { useContext, useResource$, useStore } from '@builder.io/qwik';
+import {
+  useContext,
+  useResource$,
+  useSignal,
+  useStore,
+  useWatch$,
+} from '@builder.io/qwik';
 import {
   AnyVariables,
   OperationContext,
   OperationResult,
   TypedDocumentNode,
 } from '@urql/core';
-import { pipe, subscribe } from 'wonka';
 import { fetchWithAbort } from '../client/fetch-with-abort';
 import { getClient } from '../client/get-client';
 import {
@@ -29,45 +34,38 @@ export const useWatchQuery = <Variables extends AnyVariables, Data = any>(
 
   const output = useStore<OperationResult<Data, Variables>>({} as any, {
     recursive: true,
+    reactive: true,
   });
 
-  return useResource$<OperationResult<Data, Variables>>(
-    async ({ track, cleanup }) => {
-      if (vars) {
-        track(vars);
-      }
+  const trigger = useSignal(0);
 
-      const client = await getClient(
-        clientFactory,
-        ssrStore,
-        qwikStore,
-        tokens
-      );
+  useWatch$(async ({ track, cleanup }) => {
+    track(trigger);
 
-      const abortCtrl = new AbortController();
-
-      const request = client.query<Data, Variables>(query, vars, {
-        ...context,
-        fetch: fetchWithAbort(abortCtrl),
-        store: output,
-        resume: true,
-      });
-
-      return new Promise((resolve, reject) => {
-        // A subscription keeps the query alive but the store is updated in
-        // the qwikExchange
-        const { unsubscribe } = pipe(
-          request,
-          subscribe((result) => {
-            resolve(output);
-          })
-        );
-
-        cleanup(() => {
-          abortCtrl.abort();
-          unsubscribe();
-        });
-      });
+    if (vars) {
+      track(() => vars);
     }
-  );
+
+    const client = await getClient(clientFactory, ssrStore, qwikStore, tokens);
+
+    const abortCtrl = new AbortController();
+
+    cleanup(() => abortCtrl.abort());
+
+    const request = client.query<Data, Variables>(query, vars, {
+      ...context,
+      fetch: fetchWithAbort(abortCtrl),
+      store: output,
+      watch: true,
+      trigger: trigger,
+    });
+
+    await request.toPromise();
+  });
+
+  return useResource$<OperationResult<Data, Variables>>(async ({ track }) => {
+    track(output);
+
+    return output;
+  });
 };

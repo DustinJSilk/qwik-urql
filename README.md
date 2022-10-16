@@ -3,16 +3,18 @@
 A small library to use Urql with Qwik.
 
 - :white_check_mark: Query & mutation hooks
-- :white_check_mark: SSR state shared to the frontend client
+- :white_check_mark: SSR
 - :white_check_mark: Lazy loaded client
 - :white_check_mark: Auth tokens
 - :white_check_mark: Abort signals
 - :white_check_mark: Re-execute queries (see example app buttons)
-- :hourglass: Reactive cache / watch for changes [Read why this is difficult](#reactive-cache)
+- :white_check_mark: Reactive cache / watch for changes
 - :hourglass: Optimistic response (This requires a reactive cache)
 - :hourglass: Code generators
 
 ## Setup
+
+This is the minimal setup required for standard Query/Mutations. [See the reactive cache section for watch queries](#reactive-cache)
 
 Create a new file to hold your Urql client configuration under `src/client.ts` and export a factory for your client.
 
@@ -115,31 +117,34 @@ export default component$(() => {
 
 ## SSR
 
-Urql natively supports SSR and rehydrating server side state on the frontend.
+Qwik doesn't hydrate on the client after SSR. This means we don't need to
+support the SSR exchange, it works without it.
 
-To make this work with Qwik we need the `ssrExchange` to support using a Qwik store to make resumability easier.
+## Reactive cache
 
-I've made some edits to the Urql ssrExchange, [use this ssrExchange](https://gist.github.com/DustinJSilk/917da8dda2b72826b8e677513d3abcb3) until I can get a PR in (or if resumability comes with a cache store later)
+Qwik doesn't natively support resumable subscriptions because they arent
+naturally serializable. To make subscriptions work, I've written a new Urql
+exchange that doesn't rely on Wonka subscriptions, but rather uses Qwik signals
+to trigger cach-only refetches. This means subscriptions can start on the server
+and continue on the frontend.
 
-Update your `client.ts` file to contain the following:
+To set this up, add the `qwikExchange` to your client and make sure it is before
+the cache exchange.
 
 ```TypeScript
-import { isServer } from '@builder.io/qwik/build';
-import { createClient } from '@urql/core';
+import { createClient, dedupExchange, fetchExchange } from '@urql/core';
+import { cacheExchange } from '@urql/exchange-graphcache';
+import { qwikExchange, ClientFactory } from 'qwik-urql';
 
-// Save and import the file linked above
-import { ssrExchange } from './ssr-exchange';
-
-export const clientFactory = (ssrStore: {}) => {
-  const ssr = ssrExchange({
-    isClient: !isServer,
-    initialState: isServer ? undefined : ssrStore,
-    store: ssrStore,
-  });
-
+export const clientFactory: ClientFactory = ({ qwikStore }) => {
   return createClient({
     url: 'http://localhost:3000/graphql',
-    exchanges: [dedupExchange, cacheExchange({}), ssr, fetchExchange],
+    exchanges: [
+      qwikExchange(qwikStore),
+      dedupExchange,
+      cacheExchange({}),
+      fetchExchange,
+    ],
   });
 };
 ```
@@ -351,24 +356,6 @@ Run the mock GraphQL server with
 Then run the Qwik City app with
 
 `yarn start`
-
-## Reactive cache
-
-Updating the UI when the GQL cache updates is not currently possible. This
-is because of how the cache works
-
-- Urql's cache has been optimised for speed which means the data structure can't
-  easily be serialized into a store so we can't simply update the cache to use a
-  Qwik store.
-- Listening for changes to the cache and placing the changes into a Qwik store
-  requires a Urql (wonka) subscription which needs to be initiated by some
-  JavaScript. Because Qwik performs SSR, subscriptions are initiated on the
-  server but then can't resume on the client without some JavaScript loading
-  which goes against Qwiks best practices.
-
-To make this work we need to use Qwik stores to avoid loading JavaScript which
-sits between the cache and the client. This may be difficult if Qwik stores
-can only be created inside components$.
 
 ## Development
 

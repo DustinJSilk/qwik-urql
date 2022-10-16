@@ -30,7 +30,7 @@ export default component$(() => {
   const storeC = useStore({ input: { id: '0', title: 'Updated title' } });
   const titleRef = useRef();
 
-  const { mutate$, loading } = useUpdateFilmMutation();
+  const { mutate$ } = useUpdateFilmMutation();
 
   return (
     <>
@@ -64,7 +64,6 @@ export default component$(() => {
           <h3>Watch</h3>
           Query film by ID and watch for cache updates
           <br />
-          <i>Resumability needs fixing</i>
           <input
             type='text'
             value={storeA.id}
@@ -78,7 +77,7 @@ export default component$(() => {
             onPending$={() => <div>Loading...</div>}
             onRejected$={() => <div>Error</div>}
             onResolved$={(res) => {
-              return <>{res.data ? res.data.film.title : 'No results'}</>;
+              return <div>{res.data?.film?.title ?? 'empty'}</div>;
             }}
           />
         </li>
@@ -111,8 +110,7 @@ export default component$(() => {
 
         <li>
           <h3>Execute mutation</h3>
-          Update film 0's title (Subscribing to changes isnt possible yet, you
-          need to refresh):
+          Update film 0's title:
           <input
             type='text'
             value={storeC.input.title}
@@ -128,7 +126,7 @@ export default component$(() => {
             Update
           </button>
           <br />
-          Loading: {loading.value ? 'true' : 'false'}
+          {/* Loading: {loading.value ? 'true' : 'false'} */}
           <br />
         </li>
       </ul>
