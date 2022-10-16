@@ -1,6 +1,6 @@
 {
   "name": "qwik-urql",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Urql support for Qwik projects",
   "scripts": {
     "build": "qwik build",
