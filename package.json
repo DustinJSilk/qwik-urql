@@ -56,7 +56,7 @@
     "registry": "https://registry.npmjs.org"
   },
   "devDependencies": {
-    "@builder.io/qwik": "0.10.0",
+    "@builder.io/qwik": "^0.11.0",
     "@builder.io/qwik-city": "^0.0.112",
     "@types/cookie": "^0.5.1",
     "@types/eslint": "8.4.6",
