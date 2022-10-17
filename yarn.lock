@@ -1222,9 +1222,9 @@ escape-string-regexp@^4.0.0:
   integrity sha512-TtpcNJ3XAzx3Gq8sWRzJaVajRs0uVxA2YAkdb1jm2YkPz4G6egUFAyA3n5vtEIZefPk5Wa4UXbKuS5fKkJWdgA==
 
 eslint-plugin-qwik@latest:
-  version "0.11.0"
-  resolved "https://registry.npmjs.org/eslint-plugin-qwik/-/eslint-plugin-qwik-0.11.0.tgz"
-  integrity sha512-vi0kmPiG3+3y+XG5l5oxsX2Krf7gVtDNI5AUYPqa/CxEE35oNxJRZxe+BmnbID64UqojoD0xyY7jqP8QJfh29Q==
+  version "0.11.1"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-qwik/-/eslint-plugin-qwik-0.11.1.tgz#23406fcf361a594ec62275edb8115f0a416c64d0"
+  integrity sha512-GIQP8EtjYV3CG/7+RHG3lrHWUxkqmeAb9L3/V6QnRQHs0Ew+u8GHAk0++OOM2vKb7xb9YbmtyiNGSgjf0k8Zcg==
 
 eslint-scope@^5.1.1:
   version "5.1.1"
