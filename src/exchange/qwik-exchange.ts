@@ -3,7 +3,7 @@ import { AnyVariables, Exchange, Operation, OperationResult } from '@urql/core';
 import { pipe, tap } from 'wonka';
 
 type Query = {
-  request: Operation<any, AnyVariables>;
+  key: number;
   response: Omit<OperationResult<any, AnyVariables>, 'operation'>;
   trigger: { value: number };
 };
@@ -23,7 +23,7 @@ class QwikExchange {
   constructor(private readonly cache: Cache) {
     if (!isServer) {
       for (const query of Object.values(this.cache.queries)) {
-        this.setDependencies(query.request.key, query.response);
+        this.setDependencies(query.key, query.response);
       }
     }
   }
@@ -83,16 +83,8 @@ class QwikExchange {
    * the client, and a trigger signal to force a refetch
    */
   private cacheRequest(operation: Operation) {
-    // Remove non-serializeable fields. Must copy first to avoid removing from
-    // the original object
-    const contextCopy = { ...operation.context };
-    delete contextCopy.fetch;
-
     this.cache.queries[operation.key] = {
-      request: {
-        ...operation,
-        context: contextCopy,
-      },
+      key: operation.key,
       response: operation.context.store,
       trigger: operation.context.trigger,
     };
