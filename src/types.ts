@@ -1,7 +1,5 @@
 import { QRL } from '@builder.io/qwik';
-import { AnyVariables, Client, OperationResult } from '@urql/core';
-import { GraphQLFormattedError } from 'graphql';
-import { DeepOmit } from 'ts-essentials';
+import { Client } from '@urql/core';
 import { Cache } from './exchange/qwik-exchange';
 
 export type UrqlAuthTokens = { token?: string; refresh?: string };
@@ -17,27 +15,3 @@ export type ClientFactory = (props: {
 }) => Client;
 
 export type ClientFactoryStore = { factory: QRL<ClientFactory> };
-
-/** A Urql OperationResult omitting any non-serializable fields */
-export type WatchedOperationResult<
-  Data,
-  Variables extends AnyVariables
-> = DeepOmit<
-  OperationResult<Data, Variables>,
-  { operation: never; error: never }
-> & {
-  error?: CombinedError;
-};
-
-/** Urql errors in a serializable format */
-export type CombinedError = {
-  name: string;
-  message: string;
-  graphQLErrors: GraphQLFormattedError[];
-  networkError?: {
-    name: string;
-    message: string;
-    stack?: string;
-  };
-  response?: any;
-};
