@@ -18,7 +18,7 @@ export const useQuery = <Variables extends AnyVariables, Data = any>(
     kind: string;
   },
   vars: Variables,
-  context?: Partial<OperationContext>
+  context?: Partial<Omit<OperationContext, 'fetch'>>
 ) => {
   const clientFactory = useContext(UrqlClientContext);
   const qwikStore = useContext(UrqlQwikContext);

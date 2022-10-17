@@ -7,12 +7,7 @@ import {
   useStore,
   useWatch$,
 } from '@builder.io/qwik';
-import {
-  AnyVariables,
-  CombinedError,
-  OperationContext,
-  TypedDocumentNode,
-} from '@urql/core';
+import { AnyVariables, OperationContext, TypedDocumentNode } from '@urql/core';
 import { fetchWithAbort } from '../client/fetch-with-abort';
 import { getClient } from '../client/get-client';
 import {
@@ -20,6 +15,8 @@ import {
   UrqlClientContext,
   UrqlQwikContext,
 } from '../components/urql-provider';
+import { serializeError } from '../helpers/errors';
+import { CombinedError } from '../types';
 
 /**
  * The mutate function needs to be a QRL
@@ -37,7 +34,7 @@ export const useMutation = <Variables extends AnyVariables, Data = any>(
     kind: string;
   },
   initialVars?: Partial<Variables>,
-  context?: Partial<OperationContext>
+  context?: Partial<Omit<OperationContext, 'fetch'>>
 ): MutationResult<Variables, Data> => {
   const clientFactory = useContext(UrqlClientContext);
   const qwikStore = useContext(UrqlQwikContext);
@@ -86,7 +83,8 @@ export const useMutation = <Variables extends AnyVariables, Data = any>(
 
     loadingSignal.value = false;
     results.data = res.data;
-    results.error = res.error;
+
+    results.error = serializeError(res.error);
   });
 
   return results;

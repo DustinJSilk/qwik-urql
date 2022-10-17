@@ -4,12 +4,7 @@ import {
   useSignal,
   useStore,
 } from '@builder.io/qwik';
-import {
-  AnyVariables,
-  OperationContext,
-  OperationResult,
-  TypedDocumentNode,
-} from '@urql/core';
+import { AnyVariables, OperationContext, TypedDocumentNode } from '@urql/core';
 import { fetchWithAbort } from '../client/fetch-with-abort';
 import { getClient } from '../client/get-client';
 import {
@@ -17,23 +12,25 @@ import {
   UrqlClientContext,
   UrqlQwikContext,
 } from '../components/urql-provider';
+import { serializeError } from '../helpers/errors';
+import { WatchedOperationResult } from '../types';
 
 export const useWatchQuery = <Variables extends AnyVariables, Data = any>(
   query: TypedDocumentNode<Data, Variables> & {
     kind: string;
   },
   vars: Variables,
-  context?: Partial<OperationContext>
+  context?: Partial<Omit<OperationContext, 'fetch'>>
 ) => {
   const clientFactory = useContext(UrqlClientContext);
   const qwikStore = useContext(UrqlQwikContext);
   const tokens = useContext(UrqlAuthContext);
 
-  const output = useStore<OperationResult<Data, Variables>>({} as any);
+  const output = useStore<WatchedOperationResult<Data, Variables>>({} as any);
 
   const trigger = useSignal(0);
 
-  return useResource$<OperationResult<Data, Variables>>(
+  return useResource$<WatchedOperationResult<Data, Variables>>(
     async ({ track, cleanup }) => {
       track(trigger);
 
@@ -55,7 +52,17 @@ export const useWatchQuery = <Variables extends AnyVariables, Data = any>(
         trigger: trigger,
       });
 
-      await request.toPromise();
+      const result = await request.toPromise();
+
+      // Remove non-serializable fields
+      delete result.operation.context.fetch;
+
+      // Update the store with the new response
+      output.data = result.data;
+      output.error = serializeError(result.error);
+      output.extensions = result.extensions;
+      output.hasNext = result.hasNext;
+      output.stale = result.stale;
 
       return output;
     }

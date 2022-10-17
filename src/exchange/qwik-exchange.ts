@@ -1,10 +1,8 @@
-import { isServer } from '@builder.io/qwik/build';
-import { AnyVariables, Exchange, Operation, OperationResult } from '@urql/core';
+import { Exchange, Operation, OperationResult } from '@urql/core';
 import { pipe, tap } from 'wonka';
 
 type Query = {
   key: number;
-  response: Omit<OperationResult<any, AnyVariables>, 'operation'>;
   trigger: { value: number };
 };
 
@@ -20,13 +18,7 @@ export type Cache = {
  * @param cache this must be an empty Qwik store
  */
 class QwikExchange {
-  constructor(private readonly cache: Cache) {
-    if (!isServer) {
-      for (const query of Object.values(this.cache.queries)) {
-        this.setDependencies(query.key, query.response);
-      }
-    }
-  }
+  constructor(private readonly cache: Cache) {}
 
   /**
    * Process outgoing requests.
@@ -51,29 +43,18 @@ class QwikExchange {
   /** Process response by updating watch stores or triggering watch refetches */
   processResponse(result: OperationResult) {
     const key = result.operation.key;
-    const store = this.cache.queries[key];
+    const watchedQuery = this.cache.queries[key];
 
     // Update all dependent queries if new data is returned
     if (result.operation.context.meta?.cacheOutcome !== 'hit' && result.data) {
-      this.triggerDependencies(result.data, new Set([result.operation.key]));
+      this.triggerDependencies(result.data, new Set([key]));
     }
 
-    // Stores only exist for watched queries and are updated here
-    if (store) {
-      // Remove non-serializable fields
-      delete result.operation.context.fetch;
-
-      // Update the store with the new response
-      store.response.data = result.data;
-      store.response.error = result.error;
-      store.response.extensions = result.extensions;
-      store.response.hasNext = result.hasNext;
-      store.response.stale = result.stale;
-
+    if (watchedQuery) {
       // Set any new dependencies returned from the request
       const trigger = result.operation.context.trigger;
       if (trigger && trigger.value === 0 && result.data) {
-        this.setDependencies(result.operation.key, result.data);
+        this.setDependencies(key, result.data);
       }
     }
   }
@@ -85,7 +66,6 @@ class QwikExchange {
   private cacheRequest(operation: Operation) {
     this.cache.queries[operation.key] = {
       key: operation.key,
-      response: operation.context.store,
       trigger: operation.context.trigger,
     };
   }
@@ -176,14 +156,7 @@ class QwikExchange {
   };
 }
 
-export const qwikExchange = (cacheStore: {}): Exchange => {
-  const cache = cacheStore as Cache;
-
-  if (!cache.queries) {
-    cache.queries = {};
-    cache.dependencies = {};
-  }
-
+export const qwikExchange = (cache: Cache): Exchange => {
   const exchange = new QwikExchange(cache);
   return exchange.run;
 };
