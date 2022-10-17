@@ -21,7 +21,7 @@ export default component$(() => {
     <UrqlProvider auth={authState} client={$(clientFactory)}>
       <QwikCity>
         <head></head>
-        <body lang='en'>
+        <body lang="en">
           <RouterOutlet />
           <ServiceWorkerRegister />
         </body>

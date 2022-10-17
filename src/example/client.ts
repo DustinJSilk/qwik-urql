@@ -59,7 +59,7 @@ export const clientFactory: ClientFactory = ({ authTokens, qwikStore }) => {
     exchanges: [
       qwikExchange(qwikStore),
       dedupExchange,
-      cacheExchange({}),
+      cacheExchange(),
       auth,
       fetchExchange,
     ],

@@ -7,7 +7,7 @@ export default component$(() => {
     <div>
       Home page
       <br />
-      <Link href='/child'>Go to page with request</Link>
+      <Link href="/child">Go to page with request</Link>
       <br />
       <br />
       <LoginButton />

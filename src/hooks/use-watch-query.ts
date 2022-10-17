@@ -47,7 +47,6 @@ export const useWatchQuery = <Variables extends AnyVariables, Data = any>(
       const request = client.query<Data, Variables>(query, vars, {
         ...context,
         fetch: fetchWithAbort(abortCtrl),
-        store: output,
         watch: true,
         trigger: trigger,
       });

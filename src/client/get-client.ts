@@ -1,10 +1,11 @@
 import { isServer } from '@builder.io/qwik/build';
 import { Client } from '@urql/core';
+import { Cache } from '../exchange/qwik-exchange';
 import { ClientFactoryStore, UrqlAuthTokens } from '../types';
 
 export const getClient = async (
   factory: ClientFactoryStore,
-  qwikStore: {},
+  qwikStore: Cache,
   authTokens?: UrqlAuthTokens
 ) => {
   let client: Client | undefined = undefined;

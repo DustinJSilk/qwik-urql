@@ -43,7 +43,7 @@ export default component$(() => {
           <h3>Query</h3>
           Query film by ID:
           <input
-            type='text'
+            type="text"
             value={storeA.id}
             onKeyUp$={(ev) =>
               (storeA.id = (ev.target as HTMLInputElement).value)
@@ -65,7 +65,7 @@ export default component$(() => {
           Query film by ID and watch for cache updates
           <br />
           <input
-            type='text'
+            type="text"
             value={storeA.id}
             onKeyUp$={(ev) =>
               (storeA.id = (ev.target as HTMLInputElement).value)
@@ -87,7 +87,7 @@ export default component$(() => {
           This uses a resource and executes immediately. There is also a button
           to trigger more mutations. <br />
           Add film title to show ID:
-          <input type='text' value={storeB.input.title} ref={titleRef} />
+          <input type="text" value={storeB.input.title} ref={titleRef} />
           <button
             onClick$={() =>
               (storeB.input = {
@@ -112,7 +112,7 @@ export default component$(() => {
           <h3>Execute mutation</h3>
           Update film 0's title:
           <input
-            type='text'
+            type="text"
             value={storeC.input.title}
             onKeyUp$={(ev) =>
               (storeC.input.title = (ev.target as HTMLInputElement).value)
