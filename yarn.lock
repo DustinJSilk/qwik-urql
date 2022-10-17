@@ -33,10 +33,10 @@
     source-map "0.7.4"
     vfile "5.3.5"
 
-"@builder.io/qwik@^0.11.0":
-  version "0.11.0"
-  resolved "https://registry.yarnpkg.com/@builder.io/qwik/-/qwik-0.11.0.tgz#e73807ba62db63efe0ecedecb653280dc21a6ec0"
-  integrity sha512-ri1t7GAnVFBhs9QUTmPHDVxCBGQwdlhqfjEn8ZXW0Qrjr5ZhWugs9t2c7hUm924juQ4mEAxIUoM8Y1OTXeuuhw==
+"@builder.io/qwik@^0.11.1":
+  version "0.11.1"
+  resolved "https://registry.yarnpkg.com/@builder.io/qwik/-/qwik-0.11.1.tgz#5adfef5babde9cbac1f07c80bd3ae83c94e076fd"
+  integrity sha512-pD4rN1XpYqkUkDcvvwPFkkE78tSCyylbe0SnD4A6tA+stiCGt7NINTn6N8cxngGKunSuc9hPBA7hrP5I9g1aDA==
 
 "@esbuild/android-arm@0.15.10":
   version "0.15.10"
