@@ -4,7 +4,6 @@ export { qwikExchange } from './exchange/qwik-exchange';
 export { useMutation } from './hooks/use-mutation';
 export { useMutationResource } from './hooks/use-mutation-resource';
 export { useQuery } from './hooks/use-query';
-export { useWatchQuery } from './hooks/use-watch-query';
 export {
   type ClientFactory,
   type ClientFactoryStore,

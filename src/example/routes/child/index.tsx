@@ -6,7 +6,7 @@ import {
 } from '@builder.io/qwik';
 import { DocumentHead, Link } from '@builder.io/qwik-city';
 import { AddFilmResource } from './gql/add-film';
-import { FilmResource, FilmWatchResource } from './gql/film';
+import { FilmResource } from './gql/film';
 import { useUpdateFilmMutation } from './gql/update-film';
 
 export default component$(() => {
@@ -41,7 +41,7 @@ export default component$(() => {
       <ul>
         <li>
           <h3>Query</h3>
-          Query film by ID:
+          Query film by ID and update when the cache updates:
           <input
             type="text"
             value={storeA.id}
@@ -56,28 +56,6 @@ export default component$(() => {
             onRejected$={() => <div>Error</div>}
             onResolved$={(res) => {
               return <>{res.data ? res.data.film.title : 'No results'}</>;
-            }}
-          />
-        </li>
-
-        <li>
-          <h3>Watch</h3>
-          Query film by ID and watch for cache updates
-          <br />
-          <input
-            type="text"
-            value={storeA.id}
-            onKeyUp$={(ev) =>
-              (storeA.id = (ev.target as HTMLInputElement).value)
-            }
-          />
-          <br />
-          <FilmWatchResource
-            vars={storeA}
-            onPending$={() => <div>Loading...</div>}
-            onRejected$={() => <div>Error</div>}
-            onResolved$={(res) => {
-              return <div>{res.data?.film?.title ?? 'empty'}</div>;
             }}
           />
         </li>

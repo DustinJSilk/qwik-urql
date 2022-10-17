@@ -123,13 +123,13 @@ support the SSR exchange, everything works without it.
 ## Reactive cache
 
 Qwik doesn't natively support resumable subscriptions because they arent
-naturally serializable. To make subscriptions work, I've written a new Urql
-exchange that doesn't rely on Wonka subscriptions, but rather uses Qwik signals
+naturally serializable. To make subscriptions work, use the qwikExchange that
+doesn't rely on Wonka subscriptions, but rather uses Qwik signals
 to trigger cach-only refetches. This means subscriptions can start on the server
 and continue on the frontend.
 
 To set this up, add the `qwikExchange` to your client and make sure it is before
-the cache exchange.
+the cache exchange. All queries will be reactive by default.
 
 ```TypeScript
 import { createClient, dedupExchange, fetchExchange } from '@urql/core';
