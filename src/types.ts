@@ -1,5 +1,6 @@
 import { QRL } from '@builder.io/qwik';
 import { Client } from '@urql/core';
+import { GraphQLFormattedError } from 'graphql';
 import { Cache } from './exchange/qwik-exchange';
 
 export type UrqlAuthTokens = { token?: string; refresh?: string };
@@ -15,3 +16,16 @@ export type ClientFactory = (props: {
 }) => Client;
 
 export type ClientFactoryStore = { factory: QRL<ClientFactory> };
+
+/** Urql errors in a serializable format */
+export type CombinedError = {
+  name: string;
+  message: string;
+  graphQLErrors: GraphQLFormattedError[];
+  networkError?: {
+    name: string;
+    message: string;
+    stack?: string;
+  };
+  response?: any;
+};
