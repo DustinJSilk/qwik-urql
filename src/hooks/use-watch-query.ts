@@ -3,7 +3,6 @@ import {
   useResource$,
   useSignal,
   useStore,
-  useWatch$,
 } from '@builder.io/qwik';
 import {
   AnyVariables,
@@ -34,33 +33,31 @@ export const useWatchQuery = <Variables extends AnyVariables, Data = any>(
 
   const trigger = useSignal(0);
 
-  useWatch$(async ({ track, cleanup }) => {
-    track(trigger);
+  return useResource$<OperationResult<Data, Variables>>(
+    async ({ track, cleanup }) => {
+      track(trigger);
 
-    if (vars) {
-      track(() => vars);
+      if (vars) {
+        track(() => vars);
+      }
+
+      const client = await getClient(clientFactory, qwikStore, tokens);
+
+      const abortCtrl = new AbortController();
+
+      cleanup(() => abortCtrl.abort());
+
+      const request = client.query<Data, Variables>(query, vars, {
+        ...context,
+        fetch: fetchWithAbort(abortCtrl),
+        store: output,
+        watch: true,
+        trigger: trigger,
+      });
+
+      await request.toPromise();
+
+      return output;
     }
-
-    const client = await getClient(clientFactory, qwikStore, tokens);
-
-    const abortCtrl = new AbortController();
-
-    cleanup(() => abortCtrl.abort());
-
-    const request = client.query<Data, Variables>(query, vars, {
-      ...context,
-      fetch: fetchWithAbort(abortCtrl),
-      store: output,
-      watch: true,
-      trigger: trigger,
-    });
-
-    await request.toPromise();
-  });
-
-  return useResource$<OperationResult<Data, Variables>>(async ({ track }) => {
-    track(output);
-
-    return output;
-  });
+  );
 };
