@@ -16,6 +16,9 @@
     "qwik": "qwik",
     "api": "node ./api/main.js"
   },
+  "stackblitz": {
+    "startCommand": "yarn install && yarn dev & yarn api"
+  },
   "main": "./lib/index.qwik.cjs",
   "qwik": "./lib/index.qwik.mjs",
   "module": "./lib/index.qwik.mjs",
