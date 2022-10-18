@@ -1,13 +1,10 @@
-import {
-  createClient,
-  dedupExchange,
-  fetchExchange,
-  makeOperation,
-} from '@urql/core';
+import { createClient, dedupExchange, makeOperation } from '@urql/core';
 import { authExchange } from '@urql/exchange-auth';
+import { executeExchange } from '@urql/exchange-execute';
 import { cacheExchange } from '@urql/exchange-graphcache';
 import { qwikExchange } from '../exchange/qwik-exchange';
 import { ClientFactory, UrqlAuthTokens } from '../types';
+import { rootValue, schema } from './api';
 
 export const clientFactory: ClientFactory = ({ authTokens, qwikStore }) => {
   const auth = authExchange<UrqlAuthTokens>({
@@ -61,7 +58,9 @@ export const clientFactory: ClientFactory = ({ authTokens, qwikStore }) => {
       dedupExchange,
       cacheExchange(),
       auth,
-      fetchExchange,
+
+      // Replace with fetchExchange for live requests
+      executeExchange({ schema, rootValue }),
     ],
   });
 };
