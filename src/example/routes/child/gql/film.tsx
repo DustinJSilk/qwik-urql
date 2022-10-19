@@ -46,7 +46,7 @@ export const FilmResource = component$((props: FilmResourceProps) => {
 
   return (
     <Resource
-      value={value}
+      value={value as any}
       onPending={props.onPending$}
       onRejected={props.onRejected$}
       onResolved={props.onResolved$}
