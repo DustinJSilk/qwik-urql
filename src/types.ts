@@ -16,7 +16,7 @@ export type ClientFactory = (props: {
 }) => Client;
 
 export type ClientStore = {
-  id: string;
+  id: number;
   factory: QRL<ClientFactory>;
 };
 

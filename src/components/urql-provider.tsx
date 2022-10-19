@@ -6,8 +6,9 @@ import {
   useContextProvider,
   useStore,
 } from '@builder.io/qwik';
-import { nanoid } from 'nanoid';
+import { clientCache } from '../client/client-cache';
 import { type Cache } from '../exchange/qwik-exchange';
+import { useServerUnmount$ } from '../hooks/use-server-unmount';
 import { ClientFactory, ClientStore, UrqlAuthTokens } from '../types';
 
 export const UrqlQwikContext = createContext<Cache>('urql-qwik-ctx');
@@ -19,11 +20,18 @@ export type UrqlProviderProps = {
   client: QRL<ClientFactory>;
 };
 
+export const idCounter = {
+  current: 0,
+};
+
 export const UrqlProvider = component$((props: UrqlProviderProps) => {
+  const id = idCounter.current++;
+
   const clientStore = useStore<ClientStore>({
     factory: props.client,
-    id: nanoid(),
+    id: id,
   });
+
   const qwikStore = useStore<Cache>({
     queries: {},
     dependencies: {},
@@ -32,6 +40,9 @@ export const UrqlProvider = component$((props: UrqlProviderProps) => {
   useContextProvider(UrqlQwikContext, qwikStore);
   useContextProvider(UrqlAuthContext, props.auth ?? {});
   useContextProvider(UrqlClientContext, clientStore);
+
+  // Remove the Urql client when the page is finished rendering
+  useServerUnmount$(() => clientCache.gc(id));
 
   return <Slot />;
 });

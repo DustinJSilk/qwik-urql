@@ -5,8 +5,8 @@ import {
   OperationResult,
   TypedDocumentNode,
 } from '@urql/core';
+import { clientCache } from '../client/client-cache';
 import { fetchWithAbort } from '../client/fetch-with-abort';
-import { getClient } from '../client/get-client';
 import {
   UrqlAuthContext,
   UrqlClientContext,
@@ -30,7 +30,7 @@ export const useMutationResource = <Variables extends AnyVariables, Data = any>(
         track(vars);
       }
 
-      const client = await getClient({
+      const client = await clientCache.getClient({
         factory: clientStore.factory,
         qwikStore,
         authTokens: tokens,

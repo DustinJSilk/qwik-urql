@@ -8,8 +8,8 @@ import {
   useWatch$,
 } from '@builder.io/qwik';
 import { AnyVariables, OperationContext, TypedDocumentNode } from '@urql/core';
+import { clientCache } from '../client/client-cache';
 import { fetchWithAbort } from '../client/fetch-with-abort';
-import { getClient } from '../client/get-client';
 import {
   UrqlAuthContext,
   UrqlClientContext,
@@ -69,7 +69,7 @@ export const useMutation = <Variables extends AnyVariables, Data = any>(
       return;
     }
 
-    const client = await getClient({
+    const client = await clientCache.getClient({
       factory: clientStore.factory,
       qwikStore,
       authTokens: tokens,

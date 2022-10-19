@@ -78,8 +78,5 @@
   },
   "peerDependencies": {
     "@urql/core": "^3.0.3"
-  },
-  "dependencies": {
-    "nanoid": "^4.0.0"
   }
 }
