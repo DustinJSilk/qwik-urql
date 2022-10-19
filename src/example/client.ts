@@ -56,7 +56,18 @@ export const clientFactory: ClientFactory = ({ authTokens, qwikStore }) => {
     exchanges: [
       qwikExchange(qwikStore),
       dedupExchange,
-      cacheExchange(),
+      cacheExchange({
+        optimistic: {
+          updateFilm(args: { input: { id: string } }) {
+            console.log('Determining optimistic result for ', args.input.id);
+            return {
+              __typename: 'Film',
+              id: args.input.id,
+              title: '---- optimistic response works ----',
+            };
+          },
+        },
+      }),
       auth,
 
       // Replace with fetchExchange for live requests
