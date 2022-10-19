@@ -6,13 +6,13 @@ import {
   useContextProvider,
   useStore,
 } from '@builder.io/qwik';
+import { nanoid } from 'nanoid';
 import { type Cache } from '../exchange/qwik-exchange';
-import { ClientFactory, ClientFactoryStore, UrqlAuthTokens } from '../types';
+import { ClientFactory, ClientStore, UrqlAuthTokens } from '../types';
 
 export const UrqlQwikContext = createContext<Cache>('urql-qwik-ctx');
 export const UrqlAuthContext = createContext<UrqlAuthTokens>('urql-auth-ctx');
-export const UrqlClientContext =
-  createContext<ClientFactoryStore>('urql-client-ctx');
+export const UrqlClientContext = createContext<ClientStore>('urql-client-ctx');
 
 export type UrqlProviderProps = {
   auth?: UrqlAuthTokens;
@@ -20,7 +20,10 @@ export type UrqlProviderProps = {
 };
 
 export const UrqlProvider = component$((props: UrqlProviderProps) => {
-  const clientFactoryStore = useStore({ factory: props.client });
+  const clientStore = useStore<ClientStore>({
+    factory: props.client,
+    id: nanoid(),
+  });
   const qwikStore = useStore<Cache>({
     queries: {},
     dependencies: {},
@@ -28,7 +31,7 @@ export const UrqlProvider = component$((props: UrqlProviderProps) => {
 
   useContextProvider(UrqlQwikContext, qwikStore);
   useContextProvider(UrqlAuthContext, props.auth ?? {});
-  useContextProvider(UrqlClientContext, clientFactoryStore);
+  useContextProvider(UrqlClientContext, clientStore);
 
   return <Slot />;
 });

@@ -36,7 +36,7 @@ export const useMutation = <Variables extends AnyVariables, Data = any>(
   initialVars?: Partial<Variables>,
   context?: Partial<Omit<OperationContext, 'fetch'>>
 ): MutationResult<Variables, Data> => {
-  const clientFactory = useContext(UrqlClientContext);
+  const clientStore = useContext(UrqlClientContext);
   const qwikStore = useContext(UrqlQwikContext);
   const tokens = useContext(UrqlAuthContext);
 
@@ -69,7 +69,12 @@ export const useMutation = <Variables extends AnyVariables, Data = any>(
       return;
     }
 
-    const client = await getClient(clientFactory, qwikStore, tokens);
+    const client = await getClient({
+      factory: clientStore.factory,
+      qwikStore,
+      authTokens: tokens,
+      id: clientStore.id,
+    });
 
     const abortCtrl = new AbortController();
     cleanup(() => abortCtrl.abort());

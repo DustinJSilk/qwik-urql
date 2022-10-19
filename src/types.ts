@@ -15,7 +15,10 @@ export type ClientFactory = (props: {
   qwikStore: Cache;
 }) => Client;
 
-export type ClientFactoryStore = { factory: QRL<ClientFactory> };
+export type ClientStore = {
+  id: string;
+  factory: QRL<ClientFactory>;
+};
 
 /** Urql errors in a serializable format */
 export type CombinedError = {

@@ -20,7 +20,7 @@ export const useQuery = <Variables extends AnyVariables, Data = any>(
   vars: Variables,
   context?: Partial<Omit<OperationContext, 'fetch'>> & { watch: boolean }
 ) => {
-  const clientFactory = useContext(UrqlClientContext);
+  const clientStore = useContext(UrqlClientContext);
   const qwikStore = useContext(UrqlQwikContext);
   const tokens = useContext(UrqlAuthContext);
 
@@ -34,7 +34,12 @@ export const useQuery = <Variables extends AnyVariables, Data = any>(
         track(() => vars);
       }
 
-      const client = await getClient(clientFactory, qwikStore, tokens);
+      const client = await getClient({
+        factory: clientStore.factory,
+        qwikStore,
+        authTokens: tokens,
+        id: clientStore.id,
+      });
 
       const abortCtrl = new AbortController();
 
