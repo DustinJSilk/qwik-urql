@@ -35,7 +35,7 @@ export const useQuery = <Variables extends AnyVariables, Data = any>(
   const qwikStore = useContext(UrqlQwikContext);
   const tokens = useContext(UrqlAuthContext);
 
-  const trigger = useSignal(0);
+  const trigger = useSignal(isServer ? 0 : 1);
 
   const subscription = useStore<{ unsubscribe?: NoSerialize<() => void> }>({});
 
@@ -44,12 +44,12 @@ export const useQuery = <Variables extends AnyVariables, Data = any>(
       OperationResult<Data, Variables>,
       { operation: never; error: never }
     >
-  >({} as any);
+  >({} as any, { recursive: true });
 
   useWatch$(async ({ track, cleanup }) => {
     console.log('Running watch');
     if (trigger.value === 0) {
-      console.log('Tracking trigger');
+      console.log('Tracking watch trigger');
       track(trigger);
     }
 
@@ -96,7 +96,10 @@ export const useQuery = <Variables extends AnyVariables, Data = any>(
       const { unsubscribe } = pipe(
         request,
         subscribe((res) => {
-          console.log('Subscription returned results');
+          console.log(
+            'Subscription returned results ',
+            (res.data as any)?.film?.title
+          );
           output.data = res.data;
         })
       );
@@ -112,6 +115,7 @@ export const useQuery = <Variables extends AnyVariables, Data = any>(
     >
   >(async ({ track }) => {
     track(output);
+    console.log('Running resource');
 
     // Wait forever if there is no output yet, to simulate loading
     if (!output.data) {
@@ -119,6 +123,7 @@ export const useQuery = <Variables extends AnyVariables, Data = any>(
       await new Promise(() => undefined);
     }
 
+    console.log('Returning resource');
     return output;
   });
 };
