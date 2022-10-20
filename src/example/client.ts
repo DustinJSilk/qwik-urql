@@ -59,11 +59,10 @@ export const clientFactory: ClientFactory = ({ authTokens, qwikStore }) => {
       cacheExchange({
         optimistic: {
           updateFilm(args: { input: { id: string } }) {
-            console.log('Determining optimistic result for ', args.input.id);
             return {
               __typename: 'Film',
               id: args.input.id,
-              title: '---- optimistic response works ----',
+              title: '---- This should show in the UI! ----',
             };
           },
         },

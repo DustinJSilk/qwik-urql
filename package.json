@@ -78,5 +78,8 @@
   },
   "peerDependencies": {
     "@urql/core": "^3.0.3"
+  },
+  "dependencies": {
+    "@urql/exchange-populate": "^1.0.0"
   }
 }

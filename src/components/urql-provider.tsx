@@ -33,7 +33,7 @@ export const UrqlProvider = component$((props: UrqlProviderProps) => {
   });
 
   const qwikStore = useStore<Cache>({
-    queries: {},
+    triggers: {},
     dependencies: {},
   });
 

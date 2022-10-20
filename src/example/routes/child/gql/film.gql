@@ -1,9 +1,0 @@
-# This file isn't used. The end goal is to have this auto-generate the
-# film.generated.tsx file with a code generator
-
-query Film($id: String!) {
-  film(id: $id) {
-    id
-    title
-  }
-}

@@ -1,21 +1,17 @@
 import { Exchange, Operation, OperationResult } from '@urql/core';
 import { pipe, tap } from 'wonka';
 
-type Query = {
-  key: number;
-  trigger: { value: number };
-};
-
 export type Cache = {
+  // A list of operations to wake up: { __typename: Operation.key[] }
   dependencies: Record<string, number[]>;
-  queries: Record<number, Query>;
+
+  // A Qwik signal used to wake up a subscription
+  triggers: Record<number, { value: number }>;
 };
 
 /**
  * This exchange allows us to resume SSR query subscriptions on the client
  * and watch the cache for updates to queries.
- *
- * @param cache this must be an empty Qwik store
  */
 class QwikExchange {
   constructor(private readonly cache: Cache) {}
@@ -31,7 +27,7 @@ class QwikExchange {
 
     // Store watched requests for retriggering later
     if (isWatched) {
-      this.cacheRequest(operation);
+      this.cache.triggers[operation.key] = operation.context.trigger;
     }
 
     // Use the cache first for future requests
@@ -43,31 +39,19 @@ class QwikExchange {
   /** Process response by updating watch stores or triggering watch refetches */
   processResponse(result: OperationResult) {
     const key = result.operation.key;
-    const watchedQuery = this.cache.queries[key];
+    const trigger = this.cache.triggers[key];
 
     // Update all dependent queries if new data is returned
     if (result.operation.context.meta?.cacheOutcome !== 'hit' && result.data) {
       this.triggerDependencies(result.data, new Set([key]));
     }
 
-    if (watchedQuery) {
+    if (trigger) {
       // Set any new dependencies returned from the request
-      const trigger = result.operation.context.trigger;
       if (trigger && trigger.value === 0 && result.data) {
         this.setDependencies(key, result.data);
       }
     }
-  }
-
-  /**
-   * Stores the request query to be continued later, the output result sent to
-   * the client, and a trigger signal to force a refetch
-   */
-  private cacheRequest(operation: Operation) {
-    this.cache.queries[operation.key] = {
-      key: operation.key,
-      trigger: operation.context.trigger,
-    };
   }
 
   /**
@@ -131,7 +115,7 @@ class QwikExchange {
         for (const dep of dependencies) {
           if (!hits.has(dep)) {
             hits.add(dep);
-            this.cache.queries[dep].trigger.value++;
+            this.cache.triggers[dep].value++;
           }
         }
       }
