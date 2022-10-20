@@ -5,8 +5,8 @@ import {
   OperationResult,
   TypedDocumentNode,
 } from '@urql/core';
+import { clientCache } from '../client/client-cache';
 import { fetchWithAbort } from '../client/fetch-with-abort';
-import { getClient } from '../client/get-client';
 import {
   UrqlAuthContext,
   UrqlClientContext,
@@ -20,7 +20,7 @@ export const useMutationResource = <Variables extends AnyVariables, Data = any>(
   vars: Variables,
   context?: Partial<Omit<OperationContext, 'fetch'>>
 ) => {
-  const clientFactory = useContext(UrqlClientContext);
+  const clientStore = useContext(UrqlClientContext);
   const qwikStore = useContext(UrqlQwikContext);
   const tokens = useContext(UrqlAuthContext);
 
@@ -30,7 +30,12 @@ export const useMutationResource = <Variables extends AnyVariables, Data = any>(
         track(vars);
       }
 
-      const client = await getClient(clientFactory, qwikStore, tokens);
+      const client = await clientCache.getClient({
+        factory: clientStore.factory,
+        qwikStore,
+        authTokens: tokens,
+        id: clientStore.id,
+      });
 
       const abortCtrl = new AbortController();
       cleanup(() => abortCtrl.abort());
