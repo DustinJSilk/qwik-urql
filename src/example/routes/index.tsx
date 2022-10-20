@@ -55,7 +55,7 @@ export default component$(() => {
         <li>
           <h3>Subscription results</h3>
           Every button click should update the UI twice, but it only updates
-          once.
+          once. Open the browser console to see the expected UI updates.
           <Resource
             value={query}
             onResolved={(res) => {
