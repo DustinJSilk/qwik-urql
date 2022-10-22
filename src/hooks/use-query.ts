@@ -47,9 +47,7 @@ export const useQuery = <Variables extends AnyVariables, Data = any>(
   >({} as any, { recursive: true });
 
   useWatch$(async ({ track, cleanup }) => {
-    console.log('Running watch');
     if (trigger.value === 0) {
-      console.log('Tracking watch trigger');
       track(trigger);
     }
 
@@ -63,7 +61,6 @@ export const useQuery = <Variables extends AnyVariables, Data = any>(
       abortCtrl.abort();
 
       if (subscription.unsubscribe) {
-        console.log('Cleaning up subscription');
         subscription.unsubscribe();
       }
     });
@@ -83,23 +80,15 @@ export const useQuery = <Variables extends AnyVariables, Data = any>(
     });
 
     if (isServer) {
-      console.log('Requesting data with promise');
-
       const res = await request.toPromise();
-      console.log('Data returned by promise');
 
       // Remove non-serializable fields
       delete res.operation.context.fetch;
       output.data = res.data;
     } else {
-      console.log('Setting up subscription');
       const { unsubscribe } = pipe(
         request,
         subscribe((res) => {
-          console.log(
-            'Subscription returned results ',
-            (res.data as any)?.film?.title
-          );
           output.data = res.data;
         })
       );
@@ -115,15 +104,12 @@ export const useQuery = <Variables extends AnyVariables, Data = any>(
     >
   >(async ({ track }) => {
     track(output);
-    console.log('Running resource');
 
     // Wait forever if there is no output yet, to simulate loading
     if (!output.data) {
-      console.log('Resource waiting for results');
       await new Promise(() => undefined);
     }
 
-    console.log('Returning resource');
     return output;
   });
 };

@@ -32,7 +32,6 @@ const data = ['Shrek', 'The Matrix', 'The Lord of the Rings', 'Something else'];
 // Create root value with resolvers
 export const rootValue = {
   film: async ({ id }: { id: string }) => {
-    console.log('GET film: waiting 1000ms');
     await new Promise((resolve) => setTimeout(resolve, 1000));
     return {
       title: data[parseInt(id) % data.length],
@@ -46,7 +45,6 @@ export const rootValue = {
     return { title, id };
   },
   updateFilm: async ({ input }: { input: { title: string; id: string } }) => {
-    console.log('UPDATE film: waiting 1000ms');
     await new Promise((resolve) => setTimeout(resolve, 1000));
     const { title, id } = input;
     data[parseInt(id, 10)] = title;
