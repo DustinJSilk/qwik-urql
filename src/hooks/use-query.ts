@@ -34,7 +34,9 @@ export const useQuery = <Variables extends AnyVariables, Data = any>(
   const clientStore = useContext(UrqlClientContext);
   const qwikStore = useContext(UrqlQwikContext);
   const tokens = useContext(UrqlAuthContext);
+  const watch = context?.watch ?? true;
 
+  // Only set up a new subscription on the client after SSR
   const trigger = useSignal(isServer ? 0 : 1);
 
   const subscription = useStore<{ unsubscribe?: NoSerialize<() => void> }>({});
@@ -47,7 +49,7 @@ export const useQuery = <Variables extends AnyVariables, Data = any>(
   >({} as any, { recursive: true });
 
   useWatch$(async ({ track, cleanup }) => {
-    if (trigger.value === 0) {
+    if (watch && trigger.value === 0) {
       track(trigger);
     }
 
@@ -73,10 +75,9 @@ export const useQuery = <Variables extends AnyVariables, Data = any>(
     });
 
     const request = client.query<Data, Variables>(query, vars, {
-      watch: true,
       ...context,
       fetch: fetchWithAbort(abortCtrl),
-      trigger: trigger,
+      trigger: watch ? trigger : undefined,
     });
 
     if (isServer) {

@@ -1,7 +1,10 @@
 import { createClient, dedupExchange, makeOperation } from '@urql/core';
 import { authExchange } from '@urql/exchange-auth';
 import { executeExchange } from '@urql/exchange-execute';
-import { cacheExchange } from '@urql/exchange-graphcache';
+import {
+  cacheExchange,
+  OptimisticMutationConfig,
+} from '@urql/exchange-graphcache';
 import { qwikExchange } from '../exchange/qwik-exchange';
 import { ClientFactory, UrqlAuthTokens } from '../types';
 import { rootValue, schema } from './api';
@@ -51,22 +54,22 @@ export const clientFactory: ClientFactory = ({ authTokens, qwikStore }) => {
     },
   });
 
+  const optimistic: OptimisticMutationConfig = {
+    updateFilm(args: { input: { id: string } }) {
+      return {
+        __typename: 'Film',
+        id: args.input.id,
+        title: '---- optimistic response ----',
+      };
+    },
+  };
+
   return createClient({
     url: 'http://localhost:3000/graphql',
     exchanges: [
-      qwikExchange(qwikStore),
+      qwikExchange({ cache: qwikStore, optimistic }),
       dedupExchange,
-      cacheExchange({
-        optimistic: {
-          updateFilm(args: { input: { id: string } }) {
-            return {
-              __typename: 'Film',
-              id: args.input.id,
-              title: '---- optimistic response ----',
-            };
-          },
-        },
-      }),
+      cacheExchange({ optimistic }),
       auth,
 
       // Replace with fetchExchange for live requests

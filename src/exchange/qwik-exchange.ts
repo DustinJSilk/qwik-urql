@@ -1,21 +1,18 @@
 import { Exchange, Operation, OperationResult } from '@urql/core';
+import { OptimisticMutationConfig } from '@urql/exchange-graphcache';
 import { pipe, tap } from 'wonka';
 
-type Query = {
-  key: number;
-  trigger: { value: number };
-};
-
 export type Cache = {
+  // Dependencies between kind:id and subscription keys
   dependencies: Record<string, number[]>;
-  queries: Record<number, Query>;
+
+  // Qwik signals that trigger subscriptions to wake up
+  triggers: Record<number, { value: number }>;
 };
 
 /**
  * This exchange allows us to resume SSR query subscriptions on the client
  * and watch the cache for updates to queries.
- *
- * @param cache this must be an empty Qwik store
  */
 class QwikExchange {
   constructor(private readonly cache: Cache) {}
@@ -27,15 +24,14 @@ class QwikExchange {
    */
   processRequest(operation: Operation) {
     const context = operation.context;
-    const isWatched = context.watch;
 
     // Store watched requests for retriggering later
-    if (isWatched) {
-      this.cacheRequest(operation);
+    if (context.trigger) {
+      this.cache.triggers[operation.key] = operation.context.trigger;
     }
 
     // Use the cache first for future requests
-    if (isWatched && context.trigger.value > 0) {
+    if (context.trigger && context.trigger.value > 0) {
       context.requestPolicy = 'cache-first';
     }
   }
@@ -43,7 +39,7 @@ class QwikExchange {
   /** Process response by updating watch stores or triggering watch refetches */
   processResponse(result: OperationResult) {
     const key = result.operation.key;
-    const watchedQuery = this.cache.queries[key];
+    const watchedQuery = this.cache.triggers[key];
 
     // Update all dependent queries if new data is returned
     if (result.operation.context.meta?.cacheOutcome !== 'hit' && result.data) {
@@ -57,17 +53,6 @@ class QwikExchange {
         this.setDependencies(key, result.data);
       }
     }
-  }
-
-  /**
-   * Stores the request query to be continued later, the output result sent to
-   * the client, and a trigger signal to force a refetch
-   */
-  private cacheRequest(operation: Operation) {
-    this.cache.queries[operation.key] = {
-      key: operation.key,
-      trigger: operation.context.trigger,
-    };
   }
 
   /**
@@ -109,7 +94,7 @@ class QwikExchange {
   /**
    * Loop through query results and trigger a refetch for any dependant queries
    */
-  private triggerDependencies(data: any, hits: Set<number>) {
+  triggerDependencies(data: any, hits: Set<number>) {
     if (typeof data !== 'object') {
       return;
     } else if (Array.isArray(data)) {
@@ -131,7 +116,7 @@ class QwikExchange {
         for (const dep of dependencies) {
           if (!hits.has(dep)) {
             hits.add(dep);
-            this.cache.queries[dep].trigger.value++;
+            this.cache.triggers[dep].value++;
           }
         }
       }
@@ -156,7 +141,28 @@ class QwikExchange {
   };
 }
 
-export const qwikExchange = (cache: Cache): Exchange => {
+export type QwikExhangeOptions = {
+  cache: Cache;
+  optimistic?: OptimisticMutationConfig;
+};
+
+export const qwikExchange = (options: QwikExhangeOptions): Exchange => {
+  const { cache, optimistic } = options;
+
   const exchange = new QwikExchange(cache);
+
+  // Wrap each optimistic method so that it first wakes up any dependant queries
+  if (optimistic) {
+    for (const key of Object.keys(optimistic)) {
+      const fn = optimistic[key];
+
+      optimistic[key] = (vars, cache, info) => {
+        const result = fn(vars, cache, info);
+        exchange.triggerDependencies(result, new Set());
+        return result;
+      };
+    }
+  }
+
   return exchange.run;
 };
