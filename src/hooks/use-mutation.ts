@@ -79,17 +79,18 @@ export const useMutation = <Variables extends AnyVariables, Data = any>(
     const abortCtrl = new AbortController();
     cleanup(() => abortCtrl.abort());
 
-    const res = await client
+    client
       .mutation<Data, Variables>(query, vars.value, {
         ...context,
         fetch: fetchWithAbort(abortCtrl),
       })
-      .toPromise();
+      .toPromise()
+      .then((res) => {
+        loadingSignal.value = false;
+        results.data = res.data;
 
-    loadingSignal.value = false;
-    results.data = res.data;
-
-    results.error = serializeError(res.error);
+        results.error = serializeError(res.error);
+      });
   });
 
   return results;
