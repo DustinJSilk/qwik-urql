@@ -60,7 +60,7 @@
     "@types/cookie": "^0.5.1",
     "@types/eslint": "8.4.7",
     "@types/node": "latest",
-    "@typescript-eslint/eslint-plugin": "5.40.1",
+    "@typescript-eslint/eslint-plugin": "5.41.0",
     "@typescript-eslint/parser": "^5.40.1",
     "@urql/exchange-auth": "^1.0.0",
     "@urql/exchange-execute": "^2.0.0",
