@@ -1,5 +1,4 @@
-import { component$, JSXNode, Resource } from '@builder.io/qwik';
-import { gql, OperationResult } from '@urql/core';
+import { gql } from '@urql/core';
 import { useQuery } from '../../../../hooks/use-query';
 
 /**
@@ -18,6 +17,7 @@ export type FilmQueryVars = {
   id: string;
 };
 
+// TODO: Constants get serialized into the HTML and should rather be lazy loaded
 export const FilmQuery = gql`
   query Film($id: String!) {
     film(id: $id) {
@@ -30,26 +30,3 @@ export const FilmQuery = gql`
 export const useFilmQuery = (vars: FilmQueryVars) => {
   return useQuery(FilmQuery, vars);
 };
-
-export type FilmResourceProps = {
-  vars: FilmQueryVars;
-  onResolved$: (
-    value: OperationResult<FilmQueryResponse, FilmQueryVars>
-  ) => JSXNode;
-  onPending$?: () => JSXNode;
-  onRejected$?: (reason: any) => JSXNode;
-};
-
-export const FilmResource = component$((props: FilmResourceProps) => {
-  const vars = props.vars;
-  const value = useFilmQuery(vars);
-
-  return (
-    <Resource
-      value={value as any}
-      onPending={props.onPending$}
-      onRejected={props.onRejected$}
-      onResolved={props.onResolved$}
-    />
-  );
-});

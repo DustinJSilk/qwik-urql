@@ -1,3 +1,4 @@
+import { isServer } from '@builder.io/qwik/build';
 import { Exchange, Operation, OperationResult } from '@urql/core';
 import { OptimisticMutationConfig } from '@urql/exchange-graphcache';
 import { pipe, tap } from 'wonka';
@@ -152,13 +153,16 @@ export const qwikExchange = (options: QwikExhangeOptions): Exchange => {
   const exchange = new QwikExchange(cache);
 
   // Wrap each optimistic method so that it first wakes up any dependant queries
-  if (optimistic) {
+  if (!isServer && optimistic) {
     for (const key of Object.keys(optimistic)) {
       const fn = optimistic[key];
 
       optimistic[key] = (vars, cache, info) => {
         const result = fn(vars, cache, info);
+        // Test subscribing now - if it works we can try synchronously waking
+        // up subscriptions before returning the result.
         exchange.triggerDependencies(result, new Set());
+
         return result;
       };
     }

@@ -48,7 +48,8 @@ export const useQuery = <Variables extends AnyVariables, Data = any>(
     >
   >({} as any, { recursive: true });
 
-  useWatch$(async ({ track, cleanup }) => {
+  // Client side wake-up and subscribe
+  useWatch$(({ track, cleanup }) => {
     if (watch && trigger.value === 0) {
       track(trigger);
     }
@@ -67,26 +68,20 @@ export const useQuery = <Variables extends AnyVariables, Data = any>(
       }
     });
 
-    const client = await clientCache.getClient({
-      factory: clientStore.factory,
-      qwikStore,
-      authTokens: tokens,
-      id: clientStore.id,
-    });
+    async function run() {
+      const client = await clientCache.getClient({
+        factory: clientStore.factory,
+        qwikStore,
+        authTokens: tokens,
+        id: clientStore.id,
+      });
 
-    const request = client.query<Data, Variables>(query, vars, {
-      ...context,
-      fetch: fetchWithAbort(abortCtrl),
-      trigger: watch ? trigger : undefined,
-    });
+      const request = client.query<Data, Variables>(query, vars, {
+        ...context,
+        fetch: fetchWithAbort(abortCtrl),
+        trigger: watch ? trigger : undefined,
+      });
 
-    if (isServer) {
-      const res = await request.toPromise();
-
-      // Remove non-serializable fields
-      delete res.operation.context.fetch;
-      output.data = res.data;
-    } else {
       const { unsubscribe } = pipe(
         request,
         subscribe((res) => {
@@ -94,7 +89,13 @@ export const useQuery = <Variables extends AnyVariables, Data = any>(
         })
       );
 
+      // TODO: Cleanup could happen before subscribing. Make sure to check
+      // if the component is still alive
       subscription.unsubscribe = noSerialize(unsubscribe);
+    }
+
+    if (!isServer) {
+      run();
     }
   });
 
@@ -103,11 +104,35 @@ export const useQuery = <Variables extends AnyVariables, Data = any>(
       OperationResult<Data, Variables>,
       { operation: never; error: never }
     >
-  >(async ({ track }) => {
-    track(output);
+  >(async ({ track, cleanup }) => {
+    // Make the fetch on the server without subscribing
+    if (isServer) {
+      const abortCtrl = new AbortController();
+      cleanup(() => abortCtrl.abort());
 
-    // Wait forever if there is no output yet, to simulate loading
-    if (!output.data) {
+      const client = await clientCache.getClient({
+        factory: clientStore.factory,
+        qwikStore,
+        authTokens: tokens,
+        id: clientStore.id,
+      });
+
+      const request = client.query<Data, Variables>(query, vars, {
+        ...context,
+        fetch: fetchWithAbort(abortCtrl),
+        trigger: watch ? trigger : undefined,
+      });
+
+      const res = await request.toPromise();
+      delete res.operation.context.fetch;
+
+      output.data = res.data;
+    } else if (!output.data) {
+      // Wait until data is injected into the output to simulate loading.
+      // The track is only used to cancel the wait on the client.
+      // TODO: Resimulate loading when making a new request with updated vars
+      // if there is no optimistic response
+      track(() => output.data);
       await new Promise(() => undefined);
     }
 

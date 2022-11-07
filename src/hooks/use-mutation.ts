@@ -60,7 +60,7 @@ export const useMutation = <Variables extends AnyVariables, Data = any>(
     }),
   });
 
-  useWatch$(async ({ track, cleanup }) => {
+  useWatch$(({ track, cleanup }) => {
     if (vars) {
       track(vars);
     }
@@ -69,28 +69,31 @@ export const useMutation = <Variables extends AnyVariables, Data = any>(
       return;
     }
 
-    const client = await clientCache.getClient({
-      factory: clientStore.factory,
-      qwikStore,
-      authTokens: tokens,
-      id: clientStore.id,
-    });
-
     const abortCtrl = new AbortController();
     cleanup(() => abortCtrl.abort());
 
-    client
-      .mutation<Data, Variables>(query, vars.value, {
-        ...context,
-        fetch: fetchWithAbort(abortCtrl),
-      })
-      .toPromise()
-      .then((res) => {
-        loadingSignal.value = false;
-        results.data = res.data;
-
-        results.error = serializeError(res.error);
+    async function run() {
+      const client = await clientCache.getClient({
+        factory: clientStore.factory,
+        qwikStore,
+        authTokens: tokens,
+        id: clientStore.id,
       });
+
+      const res = await client
+        .mutation<Data, Variables>(query, vars.value, {
+          ...context,
+          fetch: fetchWithAbort(abortCtrl),
+        })
+        .toPromise();
+
+      loadingSignal.value = false;
+      results.data = res.data;
+
+      results.error = serializeError(res.error);
+    }
+
+    run();
   });
 
   return results;

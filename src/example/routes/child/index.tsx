@@ -1,12 +1,13 @@
 import {
   component$,
+  Resource,
   useRef,
   useStore,
   useStylesScoped$,
 } from '@builder.io/qwik';
 import { DocumentHead, Link } from '@builder.io/qwik-city';
 import { AddFilmResource } from './gql/add-film';
-import { FilmResource } from './gql/film';
+import { useFilmQuery } from './gql/film';
 import { useUpdateFilmMutation } from './gql/update-film';
 
 export default component$(() => {
@@ -32,6 +33,8 @@ export default component$(() => {
 
   const { mutate$ } = useUpdateFilmMutation();
 
+  const filmQuery = useFilmQuery(storeA);
+
   return (
     <>
       <Link href={'/'}>Back home</Link>
@@ -50,11 +53,11 @@ export default component$(() => {
             }
           />
           <br />
-          <FilmResource
-            vars={storeA}
-            onPending$={() => <div>Loading...</div>}
-            onRejected$={() => <div>Error</div>}
-            onResolved$={(res) => {
+          <Resource
+            value={filmQuery}
+            onPending={() => <div>Loading...</div>}
+            onRejected={() => <div>Error</div>}
+            onResolved={(res) => {
               return <>{res.data ? res.data.film.title : 'No results'}</>;
             }}
           />
@@ -76,6 +79,7 @@ export default component$(() => {
             Add
           </button>
           <br />
+          {/* TODO: Qwik doesn't allow async props */}
           <AddFilmResource
             vars={storeB}
             onPending$={() => <div>Loading...</div>}
@@ -96,13 +100,7 @@ export default component$(() => {
               (storeC.input.title = (ev.target as HTMLInputElement).value)
             }
           />
-          <button
-            onClick$={async () => {
-              await mutate$(storeC);
-            }}
-          >
-            Update
-          </button>
+          <button onClick$={() => mutate$(storeC)}>Update</button>
           <br />
           {/* Loading: {loading.value ? 'true' : 'false'} */}
           <br />
