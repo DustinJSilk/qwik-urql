@@ -6,7 +6,7 @@ import {
   useStylesScoped$,
 } from '@builder.io/qwik';
 import { DocumentHead, Link } from '@builder.io/qwik-city';
-import { AddFilmResource } from './gql/add-film';
+import { useAddFilmMutation } from './gql/add-film';
 import { useFilmQuery } from './gql/film';
 import { useUpdateFilmMutation } from './gql/update-film';
 
@@ -33,6 +33,7 @@ export default component$(() => {
 
   const { mutate$ } = useUpdateFilmMutation();
 
+  const addFilmMutation = useAddFilmMutation(storeB);
   const filmQuery = useFilmQuery(storeA);
 
   return (
@@ -79,12 +80,11 @@ export default component$(() => {
             Add
           </button>
           <br />
-          {/* TODO: Qwik doesn't allow async props */}
-          <AddFilmResource
-            vars={storeB}
-            onPending$={() => <div>Loading...</div>}
-            onRejected$={(reason) => <div>Error {reason}</div>}
-            onResolved$={(res) => (
+          <Resource
+            value={addFilmMutation}
+            onPending={() => <div>Loading...</div>}
+            onRejected={(reason) => <div>Error {reason}</div>}
+            onResolved={(res) => (
               <>{res.data ? res.data.addFilm.id : 'Failed'}</>
             )}
           />
