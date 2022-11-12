@@ -55,28 +55,26 @@
     "registry": "https://registry.npmjs.org"
   },
   "devDependencies": {
-    "@builder.io/qwik": "^0.11.1",
-    "@builder.io/qwik-city": "^0.0.112",
+    "@builder.io/qwik": "^0.13.1",
+    "@builder.io/qwik-city": "^0.0.121",
     "@types/cookie": "^0.5.1",
-    "@types/eslint": "8.4.7",
+    "@types/eslint": "8.4.10",
     "@types/node": "latest",
-    "@typescript-eslint/eslint-plugin": "5.40.1",
-    "@typescript-eslint/parser": "^5.40.1",
+    "@typescript-eslint/eslint-plugin": "5.42.1",
+    "@typescript-eslint/parser": "^5.42.1",
+    "@urql/core": "^3.0.5",
     "@urql/exchange-auth": "^1.0.0",
     "@urql/exchange-execute": "^2.0.0",
-    "@urql/exchange-graphcache": "^5.0.2",
+    "@urql/exchange-graphcache": "^5.0.5",
     "cookie": "^0.5.0",
-    "eslint": "8.26.0",
-    "eslint-plugin-qwik": "latest",
+    "eslint": "8.27.0",
+    "eslint-plugin-qwik": "0.13.1",
     "graphql": "^16.6.0",
-    "node-fetch": "3.2.10",
+    "node-fetch": "3.3.0",
     "np": "7.6.2",
     "prettier": "2.7.1",
     "ts-essentials": "^9.3.0",
     "typescript": "4.8.4",
-    "vite": "3.1.8"
-  },
-  "peerDependencies": {
-    "@urql/core": "^3.0.3"
+    "vite": "3.2.3"
   }
 }

@@ -1,5 +1,4 @@
-import { component$, JSXNode, Resource } from '@builder.io/qwik';
-import { gql, OperationResult } from '@urql/core';
+import { gql } from '@urql/core';
 import { useMutationResource } from '../../../../hooks/use-mutation-resource';
 
 /**
@@ -34,26 +33,3 @@ export const AddFilmMutation = gql`
 export const useAddFilmMutation = (vars: AddFilmMutationVars) => {
   return useMutationResource(AddFilmMutation, vars);
 };
-
-export type FilmResourceProps = {
-  vars: AddFilmMutationVars;
-  onResolved$: (
-    value: OperationResult<AddFilmMutationResponse, AddFilmMutationVars>
-  ) => JSXNode;
-  onPending$?: () => JSXNode;
-  onRejected$?: (reason: any) => JSXNode;
-};
-
-export const AddFilmResource = component$((props: FilmResourceProps) => {
-  const vars = props.vars;
-  const value = useAddFilmMutation(vars);
-
-  return (
-    <Resource
-      value={value}
-      onPending={props.onPending$}
-      onRejected={props.onRejected$}
-      onResolved={props.onResolved$}
-    />
-  );
-});
