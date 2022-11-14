@@ -34,9 +34,9 @@
     vfile "5.3.5"
 
 "@builder.io/qwik@^0.13.1":
-  version "0.13.1"
-  resolved "https://registry.yarnpkg.com/@builder.io/qwik/-/qwik-0.13.1.tgz#0a9fe1793775a1a7402d595f31bac15115833d46"
-  integrity sha512-5c2AWj376neLxZZTT5hnSArjiSYj8Psmr2wa89vJ4SZvwViCT8l8fjZ+8z+grBi9Si6X/I3liNCB0S03KUAd5w==
+  version "0.13.3"
+  resolved "https://registry.yarnpkg.com/@builder.io/qwik/-/qwik-0.13.3.tgz#31a65aa112c55d78d3b805fff6ef4577953b7260"
+  integrity sha512-revtQDBww5lYM6oEsmdRk0n+Z38sFghxjbpyNZFjN3h20FHoym7fXwxSUag+0wdeU9c3CRWDKoLJFtnngcLfCg==
 
 "@esbuild/android-arm@0.15.13":
   version "0.15.13"
