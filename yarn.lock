@@ -23,10 +23,10 @@
     chalk "^2.0.0"
     js-tokens "^4.0.0"
 
-"@builder.io/qwik-city@^0.0.121":
-  version "0.0.121"
-  resolved "https://registry.yarnpkg.com/@builder.io/qwik-city/-/qwik-city-0.0.121.tgz#38c1be2f20a881fb44158565fb65ca58936f502b"
-  integrity sha512-waNsVgwavM4BFnDebh369S+9IDUFvs3KvtxIkvrGPPMkKCdDQxbL414oX+SmM2KJeKflwWfEGFU+MYsmko+wTg==
+"@builder.io/qwik-city@^0.0.122":
+  version "0.0.122"
+  resolved "https://registry.yarnpkg.com/@builder.io/qwik-city/-/qwik-city-0.0.122.tgz#1330a0dd492f2c3d9892b0f16da34e25bdd427dd"
+  integrity sha512-p1fMVvzREKjEnq2Mf2F4D272OaguA4uSj9qxmCXHZmvG5T355QFRGlq6tTgC7nJAqwlTAB8thhB/3kykfBO/Ng==
   dependencies:
     "@mdx-js/mdx" "2.1.5"
     "@types/mdx" "2.0.3"
