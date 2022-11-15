@@ -57,13 +57,13 @@
     "registry": "https://registry.npmjs.org"
   },
   "devDependencies": {
-    "@builder.io/qwik": "^0.13.1",
+    "@builder.io/qwik": "^0.13.3",
     "@builder.io/qwik-city": "^0.0.122",
     "@types/cookie": "^0.5.1",
     "@types/eslint": "8.4.10",
     "@types/node": "latest",
-    "@typescript-eslint/eslint-plugin": "5.42.1",
-    "@typescript-eslint/parser": "^5.42.1",
+    "@typescript-eslint/eslint-plugin": "5.43.0",
+    "@typescript-eslint/parser": "^5.43.0",
     "@urql/core": "^3.0.5",
     "@urql/exchange-auth": "^1.0.0",
     "@urql/exchange-execute": "^2.0.0",
