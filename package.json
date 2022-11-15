@@ -13,6 +13,7 @@
     "lint": "eslint \"src/**/*.ts*\"",
     "release": "np",
     "start": "vite --open --mode ssr",
+    "test.unit": "vitest src",
     "qwik": "qwik"
   },
   "main": "./lib/index.qwik.cjs",
@@ -68,13 +69,14 @@
     "@urql/exchange-graphcache": "^5.0.5",
     "cookie": "^0.5.0",
     "eslint": "8.27.0",
-    "eslint-plugin-qwik": "0.13.3",
+    "eslint-plugin-qwik": "^0.13.3",
     "graphql": "^16.6.0",
     "node-fetch": "3.3.0",
     "np": "7.6.2",
     "prettier": "2.7.1",
     "ts-essentials": "^9.3.0",
     "typescript": "4.8.4",
-    "vite": "3.2.3"
+    "vite": "3.2.3",
+    "vitest": "^0.25.0"
   }
 }

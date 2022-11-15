@@ -8,6 +8,7 @@ export const login = async ({ lang }: { lang?: string }) => {
   // const result = await signInWithPopup(auth, provider);
   // const token = await result.user.getIdToken();
 
+  console.log(lang);
   const token = 'my-fake-token';
 
   // Post the token to the Qwik server so that the server can return a
