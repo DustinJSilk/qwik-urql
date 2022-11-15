@@ -14,6 +14,7 @@
     "release": "np",
     "start": "vite --open --mode ssr",
     "test.unit": "vitest src",
+    "test": "npm run test.unit",
     "qwik": "qwik"
   },
   "main": "./lib/index.qwik.cjs",
