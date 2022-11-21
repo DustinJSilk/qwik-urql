@@ -23,12 +23,13 @@
     chalk "^2.0.0"
     js-tokens "^4.0.0"
 
-"@builder.io/qwik-city@^0.0.122":
-  version "0.0.122"
-  resolved "https://registry.yarnpkg.com/@builder.io/qwik-city/-/qwik-city-0.0.122.tgz#1330a0dd492f2c3d9892b0f16da34e25bdd427dd"
-  integrity sha512-p1fMVvzREKjEnq2Mf2F4D272OaguA4uSj9qxmCXHZmvG5T355QFRGlq6tTgC7nJAqwlTAB8thhB/3kykfBO/Ng==
+"@builder.io/qwik-city@^0.0.123":
+  version "0.0.123"
+  resolved "https://registry.yarnpkg.com/@builder.io/qwik-city/-/qwik-city-0.0.123.tgz#e74ad12a69bcc39f44396e26b68a41f0cd4b35e6"
+  integrity sha512-3SPoT6rx4CHZG0qp2aPcachXNSfRCqM5GI7IWgYm9yXzYGY6LxN7WAttZ7MgRpSqxtVPRSHqWxvEZq4gQExWJw==
   dependencies:
     "@mdx-js/mdx" "2.1.5"
+    "@playwright/test" "1.27.1"
     "@types/mdx" "2.0.3"
     source-map "0.7.4"
     vfile "5.3.5"
@@ -130,6 +131,14 @@
   dependencies:
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
+
+"@playwright/test@1.27.1":
+  version "1.27.1"
+  resolved "https://registry.yarnpkg.com/@playwright/test/-/test-1.27.1.tgz#9364d1e02021261211c8ff586d903faa79ce95c4"
+  integrity sha512-mrL2q0an/7tVqniQQF6RBL2saskjljXzqNcCOVMUjRIgE6Y38nCNaP+Dc2FBW06bcpD3tqIws/HT9qiMHbNU0A==
+  dependencies:
+    "@types/node" "*"
+    playwright-core "1.27.1"
 
 "@samverschueren/stream-to-observable@^0.3.0", "@samverschueren/stream-to-observable@^0.3.1":
   version "0.3.1"
@@ -3248,6 +3257,11 @@ pkg-dir@^5.0.0:
   integrity sha512-NPE8TDbzl/3YQYY7CSS228s3g2ollTFnc+Qi3tqmqJp9Vg2ovUpixcJEo2HJScN2Ez+kEaal6y70c0ehqJBJeA==
   dependencies:
     find-up "^5.0.0"
+
+playwright-core@1.27.1:
+  version "1.27.1"
+  resolved "https://registry.yarnpkg.com/playwright-core/-/playwright-core-1.27.1.tgz#840ef662e55a3ed759d8b5d3d00a5f885a7184f4"
+  integrity sha512-9EmeXDncC2Pmp/z+teoVYlvmPWUC6ejSSYZUln7YaP89Z6lpAaiaAnqroUt/BoLo8tn7WYShcfaCh+xofZa44Q==
 
 postcss@^8.4.18:
   version "8.4.19"
