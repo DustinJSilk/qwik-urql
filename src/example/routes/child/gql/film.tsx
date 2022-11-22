@@ -18,7 +18,7 @@ export type FilmQueryVars = {
 };
 
 // TODO: Constants get serialized into the HTML and should rather be lazy loaded
-export const FilmQuery = gql`
+export const FilmQuery = gql<FilmQueryResponse, { id: string }>`
   query Film($id: String!) {
     film(id: $id) {
       id

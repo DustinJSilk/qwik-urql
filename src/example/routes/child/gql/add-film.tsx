@@ -21,7 +21,10 @@ export type AddFilmMutationVars = {
   input: AddFilmInput;
 };
 
-export const AddFilmMutation = gql`
+export const AddFilmMutation = gql<
+  AddFilmMutationResponse,
+  AddFilmMutationVars
+>`
   mutation AddFilm($input: AddFilmInput!) {
     addFilm(input: $input) {
       title

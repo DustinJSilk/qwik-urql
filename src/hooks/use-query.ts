@@ -1,6 +1,4 @@
 import {
-  noSerialize,
-  NoSerialize,
   ResourceReturn,
   useContext,
   useResource$,
@@ -25,15 +23,43 @@ import {
   UrqlQwikContext,
 } from '../components/urql-provider';
 
-export const useQuery = <Variables extends AnyVariables, Data = any>(
-  query: TypedDocumentNode<Data, Variables> & {
-    kind: string;
-  },
-  vars?: Variables,
+export type UseQueryResponse<D, V extends AnyVariables> = DeepOmit<
+  OperationResult<D, V>,
+  { operation: never; error: never }
+>;
+
+export type UseQueryResource<D, V extends AnyVariables> = ResourceReturn<
+  UseQueryResponse<D, V>
+>;
+
+type OptionalVars<D, V extends AnyVariables> = [
+  query: TypedDocumentNode<D, V> & { kind: string },
+  vars?: V,
   context?: Partial<Omit<OperationContext, 'fetch'>> & { watch: boolean }
-): ResourceReturn<
-  DeepOmit<OperationResult<Data, Variables>, { operation: never; error: never }>
-> => {
+];
+
+type RequiredVars<D, V extends AnyVariables> = [
+  query: TypedDocumentNode<D, V> & { kind: string },
+  vars: V,
+  context?: Partial<Omit<OperationContext, 'fetch'>> & { watch: boolean }
+];
+
+/**
+ * Setting the context.watch option to false with not create a subscription
+ * which can reduce the serialized load and give a very minor performance
+ * benefit.
+ *
+ * @param query TypedDocumentNode created using gql`...`
+ * @param vars Input variables for the query.
+ * @param context Optional context to pass to Urql.
+ *
+ * @returns Qwik ResourceReturn to be used with a <Resource /> component
+ */
+export const useQuery = <D, V extends AnyVariables>(
+  ...args: {} extends V ? OptionalVars<D, V> : RequiredVars<D, V>
+): UseQueryResource<D, V> => {
+  const [query, vars, context] = args;
+
   const clientStore = useContext(UrqlClientContext);
   const qwikStore = useContext(UrqlQwikContext);
   const tokens = useContext(UrqlAuthContext);
@@ -42,14 +68,9 @@ export const useQuery = <Variables extends AnyVariables, Data = any>(
   // Only set up a new subscription on the client after SSR
   const trigger = useSignal(isServer ? 0 : 1);
 
-  const subscription = useStore<{ unsubscribe?: NoSerialize<() => void> }>({});
-
-  const output = useStore<
-    DeepOmit<
-      OperationResult<Data, Variables>,
-      { operation: never; error: never }
-    >
-  >({} as any, { recursive: true });
+  const output = useStore<UseQueryResponse<D, V>>({} as any, {
+    recursive: true,
+  });
 
   // Client side wake-up and subscribe
   useWatch$(({ track, cleanup }) => {
@@ -63,11 +84,15 @@ export const useQuery = <Variables extends AnyVariables, Data = any>(
 
     const abortCtrl = new AbortController();
 
+    let unsubscribe: () => void;
+    let isCleaned = false;
+
     cleanup(() => {
+      isCleaned = true;
       abortCtrl.abort();
 
-      if (subscription.unsubscribe) {
-        subscription.unsubscribe();
+      if (unsubscribe) {
+        unsubscribe();
       }
     });
 
@@ -79,26 +104,25 @@ export const useQuery = <Variables extends AnyVariables, Data = any>(
         id: clientStore.id,
       });
 
-      const request = client.query<Data, Variables>(
-        query,
-        vars ?? ({} as Variables),
-        {
-          ...context,
-          fetch: fetchWithAbort(abortCtrl),
-          trigger: watch ? trigger : undefined,
-        }
-      );
+      const request = client.query<D, V>(query, vars ?? ({} as V), {
+        ...context,
+        fetch: fetchWithAbort(abortCtrl),
+        trigger: watch ? trigger : undefined,
+      });
 
-      const { unsubscribe } = pipe(
+      // Cleanup could happen while waiting for the client so ignore the request
+      if (isCleaned) {
+        return;
+      }
+
+      const subscription = pipe(
         request,
         subscribe((res) => {
           output.data = res.data;
         })
       );
 
-      // TODO: Cleanup could happen before subscribing. Make sure to check
-      // if the component is still alive
-      subscription.unsubscribe = noSerialize(unsubscribe);
+      unsubscribe = subscription.unsubscribe;
     }
 
     if (!isServer) {
@@ -106,12 +130,7 @@ export const useQuery = <Variables extends AnyVariables, Data = any>(
     }
   });
 
-  return useResource$<
-    DeepOmit<
-      OperationResult<Data, Variables>,
-      { operation: never; error: never }
-    >
-  >(async ({ track, cleanup }) => {
+  return useResource$<UseQueryResponse<D, V>>(async ({ track, cleanup }) => {
     // Make the fetch on the server without subscribing
     if (isServer) {
       const abortCtrl = new AbortController();
@@ -124,15 +143,11 @@ export const useQuery = <Variables extends AnyVariables, Data = any>(
         id: clientStore.id,
       });
 
-      const request = client.query<Data, Variables>(
-        query,
-        vars ?? ({} as Variables),
-        {
-          ...context,
-          fetch: fetchWithAbort(abortCtrl),
-          trigger: watch ? trigger : undefined,
-        }
-      );
+      const request = client.query<D, V>(query, vars ?? ({} as V), {
+        ...context,
+        fetch: fetchWithAbort(abortCtrl),
+        trigger: watch ? trigger : undefined,
+      });
 
       const res = await request.toPromise();
       delete res.operation.context.fetch;
