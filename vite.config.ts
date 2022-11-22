@@ -1,6 +1,7 @@
 import { qwikCity } from '@builder.io/qwik-city/vite';
 import { qwikVite } from '@builder.io/qwik/optimizer';
 import { defineConfig } from 'vite';
+import tsconfigPaths from 'vite-tsconfig-paths';
 
 export default defineConfig(() => {
   return {
@@ -12,6 +13,10 @@ export default defineConfig(() => {
         fileName: (format) => `index.qwik.${format === 'es' ? 'mjs' : 'cjs'}`,
       },
     },
-    plugins: [qwikCity({ routesDir: 'src/example/routes' }), qwikVite()],
+    plugins: [
+      qwikCity({ routesDir: 'src/example/routes' }),
+      qwikVite(),
+      tsconfigPaths(),
+    ],
   };
 });

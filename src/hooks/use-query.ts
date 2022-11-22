@@ -1,6 +1,7 @@
 import {
   noSerialize,
   NoSerialize,
+  ResourceReturn,
   useContext,
   useResource$,
   useSignal,
@@ -28,9 +29,11 @@ export const useQuery = <Variables extends AnyVariables, Data = any>(
   query: TypedDocumentNode<Data, Variables> & {
     kind: string;
   },
-  vars: Variables,
+  vars?: Variables,
   context?: Partial<Omit<OperationContext, 'fetch'>> & { watch: boolean }
-) => {
+): ResourceReturn<
+  DeepOmit<OperationResult<Data, Variables>, { operation: never; error: never }>
+> => {
   const clientStore = useContext(UrqlClientContext);
   const qwikStore = useContext(UrqlQwikContext);
   const tokens = useContext(UrqlAuthContext);
@@ -76,11 +79,15 @@ export const useQuery = <Variables extends AnyVariables, Data = any>(
         id: clientStore.id,
       });
 
-      const request = client.query<Data, Variables>(query, vars, {
-        ...context,
-        fetch: fetchWithAbort(abortCtrl),
-        trigger: watch ? trigger : undefined,
-      });
+      const request = client.query<Data, Variables>(
+        query,
+        vars ?? ({} as Variables),
+        {
+          ...context,
+          fetch: fetchWithAbort(abortCtrl),
+          trigger: watch ? trigger : undefined,
+        }
+      );
 
       const { unsubscribe } = pipe(
         request,
@@ -117,11 +124,15 @@ export const useQuery = <Variables extends AnyVariables, Data = any>(
         id: clientStore.id,
       });
 
-      const request = client.query<Data, Variables>(query, vars, {
-        ...context,
-        fetch: fetchWithAbort(abortCtrl),
-        trigger: watch ? trigger : undefined,
-      });
+      const request = client.query<Data, Variables>(
+        query,
+        vars ?? ({} as Variables),
+        {
+          ...context,
+          fetch: fetchWithAbort(abortCtrl),
+          trigger: watch ? trigger : undefined,
+        }
+      );
 
       const res = await request.toPromise();
       delete res.operation.context.fetch;

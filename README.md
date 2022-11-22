@@ -343,13 +343,7 @@ until it is merged**
 An example app is included in the repository.
 The source code is found in `src/example`
 
-Run the mock GraphQL server with
-
-`yarn api`
-
-Then run the Qwik City app with
-
-`yarn start`
+`pnpm start`
 
 ## Development
 
