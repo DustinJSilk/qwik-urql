@@ -28,7 +28,6 @@ specifiers:
 
 dependencies:
   vite-tsconfig-paths: 3.6.0_vite@3.2.4
-  wonka: 6.1.1
 
 devDependencies:
   '@builder.io/qwik': 0.14.0
@@ -53,6 +52,7 @@ devDependencies:
   typescript: 4.9.3
   vite: 3.2.4_@types+node@18.11.9
   vitest: 0.25.2
+  wonka: 6.1.1
 
 packages:
 
@@ -4348,6 +4348,7 @@ packages:
 
   /wonka/6.1.1:
     resolution: {integrity: sha512-shBtyZ0KFvUadtnDGlTRA4mF4pgcRoyZKikdputKhmShoXWcZDvlg6CUw6Jx9nTL7Ub8QUJoIarPpxdlosg9cw==}
+    dev: true
 
   /word-wrap/1.2.3:
     resolution: {integrity: sha512-Hz/mrNwitNRh/HUAtM/VT/5VH+ygD6DV7mYKZAtHOrbs8U7lvPS6xf7EJKMF0uW1KJCl0H701g3ZGus+muE5vQ==}
