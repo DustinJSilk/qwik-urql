@@ -5,6 +5,11 @@ import { Cache } from './exchange/qwik-exchange';
 
 export type UrqlAuthTokens = { token?: string; refresh?: string };
 
+export type UrqlOptions = {
+  // Se the default watch behaviour.
+  watch?: boolean;
+};
+
 /**
  * A factory for creating new Urql clients. It must accept a Qwik store that
  * can be used with the qwikExchange and an auth token which can be used by the

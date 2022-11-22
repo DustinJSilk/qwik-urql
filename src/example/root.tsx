@@ -1,6 +1,6 @@
 import { $, component$, useContextProvider, useStore } from '@builder.io/qwik';
 import {
-  QwikCity,
+  QwikCityProvider,
   RouterOutlet,
   ServiceWorkerRegister,
 } from '@builder.io/qwik-city';
@@ -18,14 +18,18 @@ export default component$(() => {
   useContextProvider(AuthStateContext, authState);
 
   return (
-    <UrqlProvider auth={authState} client={$(clientFactory)}>
-      <QwikCity>
+    <UrqlProvider
+      auth={authState}
+      client={$(clientFactory)}
+      options={{ watch: true }}
+    >
+      <QwikCityProvider>
         <head></head>
         <body lang="en">
           <RouterOutlet />
           <ServiceWorkerRegister />
         </body>
-      </QwikCity>
+      </QwikCityProvider>
     </UrqlProvider>
   );
 });

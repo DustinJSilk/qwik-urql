@@ -20,6 +20,7 @@ import { fetchWithAbort } from '../client/fetch-with-abort';
 import {
   UrqlAuthContext,
   UrqlClientContext,
+  UrqlOptionsContext,
   UrqlQwikContext,
 } from '../components/urql-provider';
 
@@ -63,7 +64,8 @@ export const useQuery = <D, V extends AnyVariables>(
   const clientStore = useContext(UrqlClientContext);
   const qwikStore = useContext(UrqlQwikContext);
   const tokens = useContext(UrqlAuthContext);
-  const watch = context?.watch ?? true;
+  const options = useContext(UrqlOptionsContext);
+  const watch = context?.watch ?? options.watch ?? true;
 
   // Only set up a new subscription on the client after SSR
   const trigger = useSignal(isServer ? 0 : 1);

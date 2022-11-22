@@ -7,4 +7,5 @@ export {
   type ClientFactory,
   type ClientStore,
   type UrqlAuthTokens,
+  type UrqlOptions,
 } from './types';
