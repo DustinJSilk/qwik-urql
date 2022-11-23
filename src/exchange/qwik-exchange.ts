@@ -111,13 +111,20 @@ class QwikExchange {
     const __typename = data.__typename;
 
     if (id && __typename) {
-      const dependencies = this.cache.dependencies[`${__typename}:${id}`];
+      const key = `${__typename}:${id}`;
+      const dependencies = this.cache.dependencies[key];
 
       if (dependencies) {
         for (const dep of dependencies) {
           if (!hits.has(dep)) {
             hits.add(dep);
+
+            // Wake up the subscription
             this.cache.triggers[dep].value++;
+
+            // Remove from cache
+            delete this.cache.triggers[dep];
+            delete this.cache.dependencies[key];
           }
         }
       }
