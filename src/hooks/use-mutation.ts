@@ -30,9 +30,11 @@ export type MutationResult<Variables extends AnyVariables, Data = any> = {
 };
 
 export const useMutation = <Variables extends AnyVariables, Data = any>(
-  query: TypedDocumentNode<Data, Variables> & {
-    kind: string;
-  },
+  queryQrl: QRL<
+    () => TypedDocumentNode<Data, Variables> & {
+      kind: string;
+    }
+  >,
   initialVars?: Partial<Variables>,
   context?: Partial<Omit<OperationContext, 'fetch'>>
 ): MutationResult<Variables, Data> => {
@@ -73,12 +75,15 @@ export const useMutation = <Variables extends AnyVariables, Data = any>(
     cleanup(() => abortCtrl.abort());
 
     async function run() {
-      const client = await clientCache.getClient({
-        factory: clientStore.factory,
-        qwikStore,
-        authTokens: tokens,
-        id: clientStore.id,
-      });
+      const [client, query] = await Promise.all([
+        clientCache.getClient({
+          factory: clientStore.factory,
+          qwikStore,
+          authTokens: tokens,
+          id: clientStore.id,
+        }),
+        queryQrl(),
+      ]);
 
       const res = await client
         .mutation<Data, Variables>(query, vars.value, {

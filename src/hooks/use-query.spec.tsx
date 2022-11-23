@@ -57,7 +57,7 @@ export type FilmQueryResponse = {
   };
 };
 
-export const FilmQuery = gql<FilmQueryResponse, { id: string }>`
+export const filmQuery = gql<FilmQueryResponse, { id: string }>`
   query Film($id: String!) {
     film(id: $id) {
       id
@@ -65,6 +65,8 @@ export const FilmQuery = gql<FilmQueryResponse, { id: string }>`
     }
   }
 `;
+
+export const FilmQuery = $(() => filmQuery);
 
 test(`[useQuery hook]: Should return query data`, async () => {
   const { screen, render } = await createDOM();
@@ -100,7 +102,7 @@ export type DirectorQueryResponse = {
   };
 };
 
-export const DirectorQuery = gql<DirectorQueryResponse, { id: string }>`
+export const directorQuery = gql<DirectorQueryResponse, { id: string }>`
   query director($id: String!) {
     director(id: $id) {
       id
@@ -115,6 +117,8 @@ export const DirectorQuery = gql<DirectorQueryResponse, { id: string }>`
     }
   }
 `;
+
+export const DirectorQuery = $(() => directorQuery);
 
 test(`[useQuery hook]: Should return nested data`, async () => {
   const { screen, render } = await createDOM();

@@ -1,3 +1,4 @@
+import { $ } from '@builder.io/qwik';
 import { gql } from '@urql/core';
 import { useQuery } from '../../../../hooks/use-query';
 
@@ -17,8 +18,7 @@ export type FilmQueryVars = {
   id: string;
 };
 
-// TODO: Constants get serialized into the HTML and should rather be lazy loaded
-export const FilmQuery = gql<FilmQueryResponse, { id: string }>`
+export const query = gql<FilmQueryResponse, { id: string }>`
   query Film($id: String!) {
     film(id: $id) {
       id
@@ -26,6 +26,8 @@ export const FilmQuery = gql<FilmQueryResponse, { id: string }>`
     }
   }
 `;
+
+export const FilmQuery = $(() => query);
 
 export const useFilmQuery = (vars: FilmQueryVars) => {
   return useQuery(FilmQuery, vars);

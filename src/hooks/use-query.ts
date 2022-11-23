@@ -1,4 +1,5 @@
 import {
+  QRL,
   ResourceReturn,
   useContext,
   useResource$,
@@ -34,13 +35,13 @@ export type UseQueryResource<D, V extends AnyVariables> = ResourceReturn<
 >;
 
 type OptionalVars<D, V extends AnyVariables> = [
-  query: TypedDocumentNode<D, V> & { kind: string },
+  queryQrl: QRL<() => TypedDocumentNode<D, V> & { kind: string }>,
   vars?: V,
   context?: Partial<Omit<OperationContext, 'fetch'>> & { watch: boolean }
 ];
 
 type RequiredVars<D, V extends AnyVariables> = [
-  query: TypedDocumentNode<D, V> & { kind: string },
+  queryQrl: QRL<() => TypedDocumentNode<D, V> & { kind: string }>,
   vars: V,
   context?: Partial<Omit<OperationContext, 'fetch'>> & { watch: boolean }
 ];
@@ -59,7 +60,7 @@ type RequiredVars<D, V extends AnyVariables> = [
 export const useQuery = <D, V extends AnyVariables>(
   ...args: {} extends V ? OptionalVars<D, V> : RequiredVars<D, V>
 ): UseQueryResource<D, V> => {
-  const [query, vars, context] = args;
+  const [queryQrl, vars, context] = args;
 
   const clientStore = useContext(UrqlClientContext);
   const qwikStore = useContext(UrqlQwikContext);
@@ -99,12 +100,15 @@ export const useQuery = <D, V extends AnyVariables>(
     });
 
     async function run() {
-      const client = await clientCache.getClient({
-        factory: clientStore.factory,
-        qwikStore,
-        authTokens: tokens,
-        id: clientStore.id,
-      });
+      const [client, query] = await Promise.all([
+        clientCache.getClient({
+          factory: clientStore.factory,
+          qwikStore,
+          authTokens: tokens,
+          id: clientStore.id,
+        }),
+        queryQrl(),
+      ]);
 
       const request = client.query<D, V>(query, vars ?? ({} as V), {
         ...context,
@@ -138,12 +142,15 @@ export const useQuery = <D, V extends AnyVariables>(
       const abortCtrl = new AbortController();
       cleanup(() => abortCtrl.abort());
 
-      const client = await clientCache.getClient({
-        factory: clientStore.factory,
-        qwikStore,
-        authTokens: tokens,
-        id: clientStore.id,
-      });
+      const [client, query] = await Promise.all([
+        clientCache.getClient({
+          factory: clientStore.factory,
+          qwikStore,
+          authTokens: tokens,
+          id: clientStore.id,
+        }),
+        queryQrl(),
+      ]);
 
       const request = client.query<D, V>(query, vars ?? ({} as V), {
         ...context,

@@ -9,7 +9,7 @@ A small library to use Urql with Qwik.
 - :white_check_mark: Abort signals
 - :white_check_mark: Re-execute queries (see example app buttons)
 - :white_check_mark: Reactive cache / watch for changes
-- :hourglass: Optimistic response (This requires a reactive cache)
+- :white_check_mark::eight_pointed_black_star: Optimistic response. Works except for the first optimistic update after SSR.
 - :hourglass: Code generators
 
 ## Setup
@@ -55,12 +55,13 @@ First compile the GQL and then call `useQuery`. The result is a Qwik
 ResourceReturn which can be used with the `<Resource />` component.
 
 ```TypeScript
-import { component$, JSXNode, Resource } from '@builder.io/qwik';
+import { component$, JSXNode, Resource, $ } from '@builder.io/qwik';
 import { gql, OperationResult } from '@urql/core';
 import { useQuery } from 'qwik-urql';
 
-// Create
-export const Query = gql`
+// Create a GQL query. This will not get serialized because it is only
+// referenced in a QRL
+export const query = gql`
   query Item($id: String!) {
     item(id: $id) {
       id
@@ -68,6 +69,9 @@ export const Query = gql`
     }
   }
 `;
+
+// Using a QRL we can drastically reduce the initial bundle size.
+export const Query = $(() => query)
 
 export default component$(() => {
   const vars = useStore({ id: '...' })
@@ -94,7 +98,7 @@ There are 2 hooks for running a mutation.
   you to delay the execution of the request until a user interaction happens.
 
 ```TypeScript
-export const Mutation = gql`
+export const mutation = gql`
   mutation UpdateItem($id: String!, $title: String!) {
     item(id: $id, title: $title) {
       id
@@ -102,6 +106,8 @@ export const Mutation = gql`
     }
   }
 `;
+
+export const Mutation = $(() => mutation)
 
 export default component$(() => {
   // You can pass in variables during initialisation or execution
@@ -122,14 +128,14 @@ support the SSR exchange, everything works without it.
 
 ## Reactive cache
 
-Qwik doesn't natively support resumable subscriptions because they arent
-naturally serializable. To make subscriptions work, use the qwikExchange that
-doesn't rely on Wonka subscriptions, but rather uses Qwik signals
-to trigger cach-only refetches. This means subscriptions can start on the server
-and continue on the frontend.
+Install the QwikExchange to enable subscriptions.
 
 To set this up, add the `qwikExchange` to your client and make sure it is before
 the cache exchange. All queries will be reactive by default.
+
+By default, all queries will create subscriptions. This can be turned off
+per request by passing in `watch: false` to the query context, or pass in a
+global default to the UrqlProvider `options` prop.
 
 ```TypeScript
 import { createClient, dedupExchange, fetchExchange } from '@urql/core';
@@ -267,7 +273,7 @@ query Film($id: String!) {
 Into something like this:
 
 ```TypeScript
-import { component$, JSXNode, Resource } from '@builder.io/qwik';
+import { component$, JSXNode, Resource, $ } from '@builder.io/qwik';
 import { gql, OperationResult } from '@urql/core';
 import { useQuery } from 'qwik-urql';
 
@@ -282,7 +288,7 @@ export type FilmQueryVars = {
   id: string;
 };
 
-export const FilmQuery = gql`
+export const filmQuery = gql`
   query Film($id: String!) {
     film(id: $id) {
       id
@@ -290,6 +296,8 @@ export const FilmQuery = gql`
     }
   }
 `;
+
+export const FilmQuery = $(() => filmQuery)
 
 export const useFilmQuery = (vars: FilmQueryVars) => {
   return useQuery(FilmQuery, vars);

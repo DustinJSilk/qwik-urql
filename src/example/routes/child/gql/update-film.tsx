@@ -1,3 +1,4 @@
+import { $ } from '@builder.io/qwik';
 import { gql } from '@urql/core';
 import { useMutation } from '../../../../hooks/use-mutation';
 
@@ -22,10 +23,7 @@ export type UpdateFilmMutationVars = {
   input: UpdateFilmInput;
 };
 
-export const UpdateFilmMutation = gql<
-  UpdateFilmMutationResponse,
-  UpdateFilmMutationVars
->`
+export const query = gql<UpdateFilmMutationResponse, UpdateFilmMutationVars>`
   mutation UpdateFilm($input: UpdateFilmInput!) {
     updateFilm(input: $input) {
       title
@@ -34,6 +32,8 @@ export const UpdateFilmMutation = gql<
   }
 `;
 
+export const UpdateFilmMutation = $(() => query);
+
 export const useUpdateFilmMutation = () => {
-  return useMutation(UpdateFilmMutation);
+  return useMutation(UpdateFilmMutation as any);
 };

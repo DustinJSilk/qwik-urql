@@ -1,4 +1,4 @@
-import { useContext, useResource$ } from '@builder.io/qwik';
+import { QRL, useContext, useResource$ } from '@builder.io/qwik';
 import {
   AnyVariables,
   OperationContext,
@@ -14,9 +14,11 @@ import {
 } from '../components/urql-provider';
 
 export const useMutationResource = <Variables extends AnyVariables, Data = any>(
-  query: TypedDocumentNode<Data, Variables> & {
-    kind: string;
-  },
+  queryQrl: QRL<
+    () => TypedDocumentNode<Data, Variables> & {
+      kind: string;
+    }
+  >,
   vars: Variables,
   context?: Partial<Omit<OperationContext, 'fetch'>>
 ) => {
@@ -30,12 +32,15 @@ export const useMutationResource = <Variables extends AnyVariables, Data = any>(
         track(vars);
       }
 
-      const client = await clientCache.getClient({
-        factory: clientStore.factory,
-        qwikStore,
-        authTokens: tokens,
-        id: clientStore.id,
-      });
+      const [client, query] = await Promise.all([
+        clientCache.getClient({
+          factory: clientStore.factory,
+          qwikStore,
+          authTokens: tokens,
+          id: clientStore.id,
+        }),
+        queryQrl(),
+      ]);
 
       const abortCtrl = new AbortController();
       cleanup(() => abortCtrl.abort());
