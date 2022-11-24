@@ -3,7 +3,7 @@
   "extends": ["config:base"],
   "assignees": ["DustinJSilk"],
   "packageRules": [{
-	  "packageNames": ["node"],
+    "packageNames": ["node"],
     "enabled": false
   }]
 }
