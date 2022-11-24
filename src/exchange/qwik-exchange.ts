@@ -15,7 +15,7 @@ export type Cache = {
  * This exchange allows us to resume SSR query subscriptions on the client
  * and watch the cache for updates to queries.
  */
-class QwikExchange {
+export class QwikExchange {
   constructor(private readonly cache: Cache) {}
 
   /**
