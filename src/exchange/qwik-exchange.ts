@@ -31,7 +31,7 @@ export class QwikExchange {
       this.cache.triggers[operation.key] = operation.context.trigger;
     }
 
-    // Use the cache first for future requests
+    // Use the cache first after waking up
     if (context.trigger && context.trigger.value > 0) {
       context.requestPolicy = 'cache-first';
     }
