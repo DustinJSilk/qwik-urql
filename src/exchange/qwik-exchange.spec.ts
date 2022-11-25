@@ -87,13 +87,11 @@ test(`[QwikExchange]: Should set nested dependencies`, async () => {
 });
 
 test(`[QwikExchange]: Should set dependencies with null fields`, async () => {
-  const result1 = {
+  const result = {
     operation: {
       key: 1,
       context: {
         trigger: { value: 0 },
-        // Force the exchange to not wake up and remove triggers for this test
-        meta: { cacheOutcome: 'hit' },
       },
     } as any as Operation,
     data: {
@@ -121,8 +119,166 @@ test(`[QwikExchange]: Should set dependencies with null fields`, async () => {
 
   const exchange = new QwikExchange(cache);
 
-  exchange.processResponse(result1);
+  exchange.processResponse(result);
 
   expect(cache.dependencies[`__typename:id`]).toEqual([1]);
   expect(cache.dependencies[`__nested:id`]).toEqual([1]);
+});
+
+test(`[QwikExchange]: Should do nothing for objects without IDs`, async () => {
+  const result = {
+    operation: {
+      key: 1,
+      context: {
+        trigger: { value: 0 },
+      },
+    } as any as Operation,
+    data: {
+      addFilm: {
+        title: 'title',
+        __typename: '__typename',
+      },
+    },
+  };
+
+  const cache: Cache = {
+    dependencies: {},
+    triggers: {
+      1: { value: 0 },
+    },
+  };
+
+  const exchange = new QwikExchange(cache);
+
+  exchange.processResponse(result);
+
+  expect(cache.dependencies).toEqual({});
+});
+
+test(`[QwikExchange]: Should wake up subscriptions for new data`, async () => {
+  const result = {
+    operation: {
+      key: 1,
+      context: {
+        trigger: { value: 0 },
+      },
+    } as any as Operation,
+    data: {
+      addFilm: {
+        title: 'title',
+        id: 'id',
+        __typename: '__typename',
+      },
+    },
+  };
+
+  let value = 0;
+
+  const cache: Cache = {
+    dependencies: {
+      '__typename:id': [2],
+    },
+    triggers: {
+      1: { value: 0 },
+      2: {
+        get value() {
+          return value;
+        },
+        set value(val: number) {
+          value = val;
+        },
+      },
+    },
+  };
+
+  const exchange = new QwikExchange(cache);
+
+  exchange.processResponse(result);
+
+  expect(value).toBe(1);
+});
+
+test(`[QwikExchange]: Should not wake up subscriptions with cache data`, async () => {
+  const result = {
+    operation: {
+      key: 1,
+      context: {
+        trigger: { value: 0 },
+        meta: { cacheOutcome: 'hit' },
+      },
+    } as any as Operation,
+    data: {
+      addFilm: {
+        title: 'title',
+        id: 'id',
+        __typename: '__typename',
+      },
+    },
+  };
+
+  let value = 0;
+
+  const cache: Cache = {
+    dependencies: {
+      '__typename:id': [2],
+    },
+    triggers: {
+      1: { value: 0 },
+      2: {
+        get value() {
+          return value;
+        },
+        set value(val: number) {
+          value = val;
+        },
+      },
+    },
+  };
+
+  const exchange = new QwikExchange(cache);
+
+  exchange.processResponse(result);
+
+  expect(value).toBe(0);
+});
+
+test(`[QwikExchange]: Should clean up triggers and dependencies after waking up`, async () => {
+  const result = {
+    operation: {
+      key: 5,
+      context: {
+        trigger: { value: 0 },
+      },
+    } as any as Operation,
+    data: {
+      addFilm: {
+        title: 'title',
+        id: 'id',
+        __typename: '__typename',
+      },
+    },
+  };
+
+  const cache: Cache = {
+    dependencies: {
+      '__typename:id': [1, 2, 3],
+      '__typename:id2': [0, 4],
+    },
+    triggers: {
+      0: { value: 0 },
+      1: { value: 0 },
+      2: { value: 0 },
+      3: { value: 0 },
+      4: { value: 0 },
+    },
+  };
+
+  const exchange = new QwikExchange(cache);
+
+  exchange.processResponse(result);
+
+  expect(cache.triggers[1]).toBe(undefined);
+  expect(cache.triggers[2]).toBe(undefined);
+  expect(cache.triggers[3]).toBe(undefined);
+  expect(cache.dependencies['__typename:id']).toBe(undefined);
 });
