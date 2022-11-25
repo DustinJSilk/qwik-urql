@@ -11,6 +11,7 @@ export type FilmQueryResponse = {
   film: {
     title: string;
     id: string;
+    subTitle?: string;
   };
 };
 
@@ -23,6 +24,7 @@ export const query = gql<FilmQueryResponse, { id: string }>`
     film(id: $id) {
       id
       title
+      subTitle
     }
   }
 `;

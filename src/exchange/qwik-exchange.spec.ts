@@ -16,7 +16,7 @@ test(`[QwikExchange]: Should store request triggers`, async () => {
   expect(cache.triggers['1']).toEqual({ value: 0 });
 });
 
-test(`[QwikExchange]: Should set dependencies`, async () => {
+test(`[QwikExchange]: Should set nested dependencies`, async () => {
   const result1 = {
     operation: {
       key: 1,
@@ -84,4 +84,45 @@ test(`[QwikExchange]: Should set dependencies`, async () => {
   expect(cache.dependencies[`__typename:id`]).toEqual([1, 2]);
   expect(cache.dependencies[`__nested:id`]).toEqual([1, 2]);
   expect(cache.dependencies[`__double_nested:id`]).toEqual([1]);
+});
+
+test(`[QwikExchange]: Should set dependencies with null fields`, async () => {
+  const result1 = {
+    operation: {
+      key: 1,
+      context: {
+        trigger: { value: 0 },
+        // Force the exchange to not wake up and remove triggers for this test
+        meta: { cacheOutcome: 'hit' },
+      },
+    } as any as Operation,
+    data: {
+      addFilm: {
+        title: 'title',
+        id: 'id',
+        subtitle: null,
+        __typename: '__typename',
+        nested: {
+          title: 'title',
+          id: 'id',
+          subtitle: null,
+          __typename: '__nested',
+        },
+      },
+    },
+  };
+
+  const cache: Cache = {
+    dependencies: {},
+    triggers: {
+      1: { value: 0 },
+    },
+  };
+
+  const exchange = new QwikExchange(cache);
+
+  exchange.processResponse(result1);
+
+  expect(cache.dependencies[`__typename:id`]).toEqual([1]);
+  expect(cache.dependencies[`__nested:id`]).toEqual([1]);
 });
