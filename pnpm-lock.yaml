@@ -14,7 +14,7 @@ specifiers:
   '@urql/exchange-graphcache': ^5.0.5
   cookie: ^0.5.0
   eslint: 8.28.0
-  eslint-plugin-qwik: ^0.14.0
+  eslint-plugin-qwik: ^0.15.0
   graphql: ^16.6.0
   node-fetch: 3.3.0
   np: 7.6.2
@@ -40,7 +40,7 @@ devDependencies:
   '@urql/exchange-graphcache': 5.0.5_graphql@16.6.0
   cookie: 0.5.0
   eslint: 8.28.0
-  eslint-plugin-qwik: 0.14.1_eslint@8.28.0
+  eslint-plugin-qwik: 0.15.0_eslint@8.28.0
   graphql: 16.6.0
   node-fetch: 3.3.0
   np: 7.6.2
@@ -1418,8 +1418,8 @@ packages:
     engines: {node: '>=10'}
     dev: true
 
-  /eslint-plugin-qwik/0.14.1_eslint@8.28.0:
-    resolution: {integrity: sha512-cxwhUgsAxRehnZBcvdT08KWjY1yjmaNHKp4U8njC9fWUEH2qBDEileWVS3QSN+hnVHADPS2BvOvWBg+0wEuIcg==}
+  /eslint-plugin-qwik/0.15.0_eslint@8.28.0:
+    resolution: {integrity: sha512-FKW5tVcG69xRncWrPKT5cI0yuY4XhpF4yVbvbKakcuHGVFbIipcCcBnJLyVEUgcCaPtDPXXhFUtl3Uo8hBpOwg==}
     engines: {node: '>=16'}
     peerDependencies:
       eslint: '>= 8'
