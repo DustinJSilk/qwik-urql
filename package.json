@@ -34,8 +34,6 @@
   ],
   "engines": {
     "node": ">=16",
-    "npm": "please-use-pnpm",
-    "yarn": "please-use-pnpm",
     "pnpm": ">=7"
   },
   "private": false,
