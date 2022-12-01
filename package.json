@@ -60,7 +60,7 @@
   },
   "devDependencies": {
     "@builder.io/qwik": "^0.15.0",
-    "@builder.io/qwik-city": "^0.0.127",
+    "@builder.io/qwik-city": "^0.0.128",
     "@types/cookie": "^0.5.1",
     "@types/eslint": "8.4.10",
     "@types/node": "latest",

@@ -2,7 +2,7 @@ lockfileVersion: 5.4
 
 specifiers:
   '@builder.io/qwik': ^0.15.0
-  '@builder.io/qwik-city': ^0.0.127
+  '@builder.io/qwik-city': ^0.0.128
   '@types/cookie': ^0.5.1
   '@types/eslint': 8.4.10
   '@types/node': latest
@@ -28,7 +28,7 @@ specifiers:
 
 devDependencies:
   '@builder.io/qwik': 0.15.0
-  '@builder.io/qwik-city': 0.0.127
+  '@builder.io/qwik-city': 0.0.128
   '@types/cookie': 0.5.1
   '@types/eslint': 8.4.10
   '@types/node': 18.11.10
@@ -75,8 +75,8 @@ packages:
       js-tokens: 4.0.0
     dev: true
 
-  /@builder.io/qwik-city/0.0.127:
-    resolution: {integrity: sha512-YvB4MZ8Hm+B+L9SQMKibcqe23EbQuRHUQ9IfZ6aUWgWKA2fMYDIcU/XO9nLtjUabr23Y5ALpx1Ak2Mu9WAe/7g==}
+  /@builder.io/qwik-city/0.0.128:
+    resolution: {integrity: sha512-IgE2nZuoyRGRpsQ9HwbWV8IaaP9rWZGgi1hSzXJLCW2GrVfB49aNph3lQYDeoBOdvUSIucfGbUXFLn7215JOFA==}
     dependencies:
       '@mdx-js/mdx': 2.1.5
       '@types/mdx': 2.0.3
