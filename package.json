@@ -72,7 +72,7 @@
     "@urql/exchange-graphcache": "^5.0.5",
     "cookie": "^0.5.0",
     "eslint": "8.28.0",
-    "eslint-plugin-qwik": "^0.14.0",
+    "eslint-plugin-qwik": "^0.15.0",
     "graphql": "^16.6.0",
     "node-fetch": "3.3.0",
     "np": "7.6.2",
