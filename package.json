@@ -38,7 +38,7 @@
   },
   "private": false,
   "type": "module",
-  "packageManager": "pnpm@7.18.2",
+  "packageManager": "pnpm@7.29.1",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/DustinJSilk/qwik-urql.git"
