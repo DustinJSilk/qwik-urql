@@ -1,6 +1,6 @@
 import {
   component$,
-  createContext,
+  createContextId,
   QRL,
   Slot,
   useContextProvider,
@@ -16,11 +16,12 @@ import {
   UrqlOptions,
 } from '../types';
 
-export const UrqlQwikContext = createContext<Cache>('urql-qwik-ctx');
-export const UrqlAuthContext = createContext<UrqlAuthTokens>('urql-auth-ctx');
-export const UrqlClientContext = createContext<ClientStore>('urql-client-ctx');
+export const UrqlQwikContext = createContextId<Cache>('urql-qwik-ctx');
+export const UrqlAuthContext = createContextId<UrqlAuthTokens>('urql-auth-ctx');
+export const UrqlClientContext =
+  createContextId<ClientStore>('urql-client-ctx');
 export const UrqlOptionsContext =
-  createContext<UrqlOptions>('urql-options-ctx');
+  createContextId<UrqlOptions>('urql-options-ctx');
 
 export type UrqlProviderProps = {
   auth?: UrqlAuthTokens;

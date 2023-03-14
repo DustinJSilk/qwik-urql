@@ -1,8 +1,8 @@
-import { useEnvData } from '@builder.io/qwik';
+import { useServerData } from '@builder.io/qwik';
 import { parse } from 'cookie';
 
 export const useCookies = () => {
-  const headers = useEnvData<Record<string, string>>('requestHeaders');
+  const headers = useServerData<Record<string, string>>('requestHeaders');
 
   if (!headers) {
     return {};

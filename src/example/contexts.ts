@@ -1,3 +1,5 @@
-import { createContext } from '@builder.io/qwik';
+import { createContextId } from '@builder.io/qwik';
 
-export const AuthStateContext = createContext<{ token: string }>('auth-state');
+export const AuthStateContext = createContextId<{ token: string }>(
+  'auth-state'
+);
