@@ -5,7 +5,7 @@ import {
   useResource$,
   useSignal,
   useStore,
-  useWatch$,
+  useTask$,
 } from '@builder.io/qwik';
 import { isServer } from '@builder.io/qwik/build';
 import {
@@ -76,7 +76,7 @@ export const useQuery = <D, V extends AnyVariables>(
   });
 
   // Client side wake-up and subscribe
-  useWatch$(({ track, cleanup }) => {
+  useTask$(({ track, cleanup }) => {
     if (watch && trigger.value === 0) {
       track(trigger);
     }
@@ -123,7 +123,7 @@ export const useQuery = <D, V extends AnyVariables>(
 
       const subscription = pipe(
         request,
-        subscribe((res) => {
+        subscribe((res: OperationResult) => {
           output.data = res.data;
         })
       );

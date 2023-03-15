@@ -1,7 +1,7 @@
 import { isServer } from '@builder.io/qwik/build';
 import { Exchange, Operation, OperationResult } from '@urql/core';
 import { OptimisticMutationConfig } from '@urql/exchange-graphcache';
-import { pipe, tap } from 'wonka';
+import { pipe, Source, tap } from 'wonka';
 
 export type Cache = {
   // Dependencies between kind:id and subscription keys
@@ -137,16 +137,16 @@ export class QwikExchange {
     }
   }
 
-  run: Exchange = ({ forward }) => {
-    return (ops$) => {
+  run({ forward }: { forward: any }): any {
+    return (ops$: Source<unknown>) => {
       return pipe(
         ops$,
-        tap((req) => this.processRequest(req)),
+        tap((req: any) => this.processRequest(req)),
         forward,
-        tap((res) => this.processResponse(res))
+        tap((res: OperationResult) => this.processResponse(res))
       );
     };
-  };
+  }
 }
 
 export type QwikExhangeOptions = {

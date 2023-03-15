@@ -1,9 +1,9 @@
-import { component$, useEnvData } from '@builder.io/qwik';
+import { component$, useServerData } from '@builder.io/qwik';
 import { useAuthState } from '../../hooks/use-auth-state';
 import { login } from './login';
 
 export const LoginButton = component$(() => {
-  const lang = useEnvData<string>('locale', 'en');
+  const lang = useServerData<string>('locale', 'en');
   const authState = useAuthState();
 
   return (

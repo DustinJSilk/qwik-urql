@@ -5,7 +5,7 @@ import {
   useContext,
   useSignal,
   useStore,
-  useWatch$,
+  useTask$,
 } from '@builder.io/qwik';
 import { AnyVariables, OperationContext, TypedDocumentNode } from '@urql/core';
 import { clientCache } from '../client/client-cache';
@@ -62,7 +62,7 @@ export const useMutation = <Variables extends AnyVariables, Data = any>(
     }),
   });
 
-  useWatch$(({ track, cleanup }) => {
+  useTask$(({ track, cleanup }) => {
     if (vars) {
       track(vars);
     }
