@@ -1,3 +1,16 @@
+
+## Archive notice
+
+```
+This project is being shutdown and archived. Since I started working with Qwik, I've realised that Qwik already solves
+many of the same problems that GraphQL solves, and in a far better way. It's also proven to be near impossible to
+get a GraphQL library working properly with Qwik without sacraficing functionality from both Qwik and the GQL library.
+Qwiks API has changed a lot since this project started, and I cant maintain it when I don't use nor recommend it.
+
+For GraphQL servers written in other languages, I recommend switching to protocol buffers and exposing the data through
+Qwiks native loaders, actions, and endpoint. GraphQL was fun while it lasted.
+```
+
 # Qwik Urql ⚡️
 
 A small library to use Urql with Qwik.
